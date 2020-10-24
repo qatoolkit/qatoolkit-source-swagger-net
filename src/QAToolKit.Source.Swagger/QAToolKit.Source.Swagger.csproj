@@ -14,6 +14,7 @@
 		</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageLicenseUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net/blob/main/LICENSE</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</PackageProjectUrl>
 		<PackageIcon>qatoolkit-64x64.png</PackageIcon>
 		<RepositoryUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</RepositoryUrl>
@@ -24,6 +25,12 @@
 	<ItemGroup>
 		<None Include="..\..\qatoolkit-64x64.png" Pack="true" PackagePath="\" />
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.OpenApi" Version="1.2.3" />
+	  <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.2.3" />
+	  <PackageReference Include="QAToolKit.Core" Version="0.1.0" />
 	</ItemGroup>
 
 </Project>
