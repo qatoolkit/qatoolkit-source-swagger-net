@@ -1,7 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>latest</LangVersion>
+
+		<!-- NuGet Metadata -->
+		<IsPackable>true</IsPackable>
+		<PackageVersion>$(Version)</PackageVersion>
+		<PackageId>QAToolKit.Source.Swagger</PackageId>
+		<Authors>QAToolKit</Authors>
+		<Description>
+			QAToolKit Swagger library, that parses Swagger files and produces a common list of HTTP requests. 
+		</Description>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageProjectUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</PackageProjectUrl>
+		<PackageIcon>qatoolkit-64x64.png</PackageIcon>
+		<RepositoryUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</RepositoryUrl>
+		<PackageTags>qatoolkit-source-swagger-net;.net;c#;f#;swagger;dotnet;netstandard</PackageTags>
+		<Configurations>Debug;Release;Debug With Project References</Configurations>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\qatoolkit-64x64.png" Pack="true" PackagePath="\" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
 
 </Project>
