@@ -3,7 +3,7 @@
 ################################################################################
 
 /.vs
-/src/QAToolKit.Source.Swagger/bin/Debug/netstandard2.0
+/src/QAToolKit.Source.Swagger/bin
 /src/QAToolKit.Source.Swagger/obj
-/test/QAToolKit.Source.Swagger.Test/bin/Debug/netcoreapp3.1
+/test/QAToolKit.Source.Swagger.Test/bin
 /test/QAToolKit.Source.Swagger.Test/obj
