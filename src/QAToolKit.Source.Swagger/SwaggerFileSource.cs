@@ -10,6 +10,14 @@ namespace QAToolKit.Source.Swagger
 {
     public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpTestRequest>>
     {
+        private SwaggerOptions _swaggerOptions;
+
+        public SwaggerFileSource(Action<SwaggerOptions> options = null)
+        {
+            _swaggerOptions = new SwaggerOptions();
+            options?.Invoke(_swaggerOptions);
+        }
+
         /// <summary>
         /// Load swagger file sources from storage
         /// </summary>
@@ -28,7 +36,7 @@ namespace QAToolKit.Source.Swagger
                 {
                     var openApiDocument = new OpenApiStreamReader().Read(fileStream, out var diagnostic);
 
-                    restRequests.AddRange(processor.MapFromOpenApiDocument(null, openApiDocument));
+                    restRequests.AddRange(processor.MapFromOpenApiDocument(null, openApiDocument, _swaggerOptions.ReplacementValues));
                 }
             }
 

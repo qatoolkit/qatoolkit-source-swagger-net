@@ -14,7 +14,6 @@
 		</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<PackageLicenseUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net/blob/main/LICENSE</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</PackageProjectUrl>
 		<PackageIcon>qatoolkit-64x64.png</PackageIcon>
 		<RepositoryUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</RepositoryUrl>

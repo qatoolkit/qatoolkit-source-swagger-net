@@ -9,20 +9,20 @@ namespace QAToolKit.Source.Swagger
 {
     public class SwaggerProcessor
     {
-        public IList<HttpTestRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
+        public IList<HttpTestRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument, ReplacementValue[] replacementValues)
         {
             var requests = new List<HttpTestRequest>();
 
             foreach (var path in openApiDocument.Paths)
             {
-                requests.AddRange(GetRestRequestsForPath(baseUri, path));
+                requests.AddRange(GetRestRequestsForPath(baseUri, path, replacementValues));
             }
 
             return requests;
         }
 
         //Only testable endpoints
-        private IList<HttpTestRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
+        private IList<HttpTestRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path, ReplacementValue[] replacementValues)
         {
             var requests = new List<HttpTestRequest>();
 
@@ -33,13 +33,13 @@ namespace QAToolKit.Source.Swagger
                 requests.Add(new HttpTestRequest()
                 {
                     BasePath = baseUri.ToString(),
-                    Path = GetPath(path.Key),
+                    Path = ReplacePathParameters(GetPath(path.Key), replacementValues),
                     Method = GetHttpMethod(operation),
                     Summary = GetSummary(operation),
                     Description = GetDescription(operation),
                     OperationId = GetOperationId(operation),
-                    Parameters = GetParameters(operation).ToList(),
-                    RequestBody = GetRequestBody(operation),
+                    Parameters = ReplaceUrlParameters(GetParameters(operation).ToList(), replacementValues).ToList(),
+                    RequestBody = ReplaceRequestBodyModel(GetRequestBody(operation), replacementValues),
                     Responses = GetResponses(operation),
                     Tags = GetTags(operation),
                     AuthenticationTypes = GetAuthenticationTypes(operation),
@@ -119,6 +119,16 @@ namespace QAToolKit.Source.Swagger
             return path;
         }
 
+        private string ReplacePathParameters(string path, ReplacementValue[] replacementValues)
+        {
+            foreach (var replacementValue in replacementValues)
+            {
+                path = path.Replace("{" + replacementValue.Key + "}", replacementValue.Value);
+            }
+
+            return path;
+        }
+
         private HttpMethod GetHttpMethod(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
         {
             var httpMethodString = openApiOperation.Key.ToString().ToLower();
@@ -172,6 +182,22 @@ namespace QAToolKit.Source.Swagger
             return parameters;
         }
 
+        private IList<Parameter> ReplaceUrlParameters(List<Parameter> urlParameters, ReplacementValue[] replacementValues)
+        {
+            foreach (var replacementValue in replacementValues)
+            {
+                foreach (var parameter in urlParameters)
+                {
+                    if (parameter.Name == replacementValue.Key)
+                    {
+                        parameter.Value = replacementValue.Value;
+                    }
+                }
+            }
+
+            return urlParameters;
+        }
+
         private RequestBody GetRequestBody(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
         {
             try
@@ -214,6 +240,37 @@ namespace QAToolKit.Source.Swagger
                 var msg = ex.Message;
                 return new RequestBody();
             }
+        }
+
+        private RequestBody ReplaceRequestBodyModel(RequestBody requestBody, ReplacementValue[] replacementValues)
+        {
+            if (requestBody.Properties == null)
+            {
+                return requestBody;
+            }
+
+            var requestBodyResult = new RequestBody
+            {
+                Name = requestBody.Name
+            };
+
+            foreach (var replacementValue in replacementValues)
+            {
+                var prop = requestBody.Properties.FirstOrDefault(p => p.Name == replacementValue.Key);
+
+                if (prop != null)
+                {
+                    requestBodyResult.Properties.Add(new Property()
+                    {
+                        Description = prop.Description,
+                        Name = prop.Name,
+                        Type = prop.Type,
+                        Value = replacementValue.Value
+                    });
+                }
+            }
+
+            return requestBodyResult;
         }
 
         private List<Response> GetResponses(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)

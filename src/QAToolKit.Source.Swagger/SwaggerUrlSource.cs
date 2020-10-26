@@ -50,7 +50,7 @@ namespace QAToolKit.Source.Swagger
 
                     var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
 
-                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
+                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument, _swaggerOptions.ReplacementValues);
 
                     if (_swaggerOptions.UseRequestFilter)
                     {
