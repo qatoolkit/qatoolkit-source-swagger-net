@@ -9,6 +9,13 @@ namespace QAToolKit.Source.Swagger
 {
     public class SwaggerProcessor
     {
+        /// <summary>
+        /// Map Swagger documents to a list of objects
+        /// </summary>
+        /// <param name="baseUri"></param>
+        /// <param name="openApiDocument"></param>
+        /// <param name="replacementValues"></param>
+        /// <returns></returns>
         public IList<HttpTestRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument, ReplacementValue[] replacementValues)
         {
             var requests = new List<HttpTestRequest>();
@@ -21,14 +28,11 @@ namespace QAToolKit.Source.Swagger
             return requests;
         }
 
-        //Only testable endpoints
         private IList<HttpTestRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path, ReplacementValue[] replacementValues)
         {
             var requests = new List<HttpTestRequest>();
 
-            foreach (var operation in path.Value.Operations
-                .Where(o => o.Value.Description.Contains(TestType.LoadTest.Value()) ||
-                            o.Value.Description.Contains(TestType.IntegrationTest.Value())))
+            foreach (var operation in path.Value.Operations)
             {
                 requests.Add(new HttpTestRequest()
                 {
