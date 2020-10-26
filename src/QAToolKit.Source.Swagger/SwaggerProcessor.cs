@@ -153,7 +153,11 @@ namespace QAToolKit.Source.Swagger
                 case "trace":
                     return HttpMethod.Trace;
                 case "patch":
+#if NETSTANDARD2_0
+                    return new HttpMethod("Patch");
+#elif NETSTANDARD2_1
                     return HttpMethod.Patch;
+#endif
                 default:
                     throw new Exception("HttpMethod invalid.");
             }
