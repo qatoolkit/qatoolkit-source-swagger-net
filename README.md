@@ -1,9 +1,131 @@
 # QAToolKit.Source.Swagger
 ![.NET Core](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
 
-QAToolKit Swagger source .NET library
+## Description
 
-# License
+`QAToolKit.Source.Swagger` is a .NET standard library, which generates `IList<HttpTestRequest>` object that is the input for other components.
+
+Major features:
+
+- Parses `OpenAPI v3.0` Swagger files,
+- swagger.json can be loaded from `disk` or from `URL`,
+- path parameters, URL paramters and JSON body models are replaced with custom values,
+- access swagger.json from URL, which is protected by `basic authentication`,
+- control which swagger endpoints are called by specifying `request filters` (check below)
+
+## Sample
+
+This is a sample of instantiating a new Swagger Source object from URL.
+
+```csharp
+// create new Swagger URL source
+SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
+    options =>
+    {
+        options.AddReplacementValues(new ReplacementValue[] {
+        new ReplacementValue()
+            {
+                Key = "version",
+                Value = "1"
+            },
+            {
+                Key = "parentId",
+                Value = "4"
+            }
+        });
+        options.AddBasicAuthentication("myuser", "mypassword");
+        options.AddRequestFilters(new RequestFilter()
+        {
+            AuthenticationTypes = new List<AuthenticationType>() { AuthenticationType.Customer },
+            TestTypes = new List<TestType>() { TestType.LoadTest },
+            EndpointNameWhitelist = new string[] { "GetCategories" }
+        });
+    });
+
+//To run the Swagger parser we need to pass an array of URLs
+IList<HttpTestRequest> requests = await swaggerSource.Load(new Uri[] {
+    new Uri("https://api.demo.com/swagger/v1/swagger.json"),
+    new Uri("https://api2.demo.com/swagger/v1/swagger.json")
+});
+```
+
+The above code is quite simple, but it needs some explanation.
+
+#### AddReplacementValues
+This is a method that will add key/value pairs for replacement values you need to replace in the Swagger requests.
+
+In the example above we say: "Replace `{version}` placeholder in Path and URL parameters and JSON body models."
+
+In other words, if you have a test API endpoint like this: https://api.demo.com/v{version}/categories?parent={parentId} that will be set to https://api.demo.com/v1/categories?parent=4.
+
+That, does not stop there, you can also populate JSON request bodies in this way:
+
+[TODO sample JSON Body]
+
+#### AddBasicAuthentication
+If your Swagger.json files are protected by basic authentication, you can set those with `AddBasicAuthentication`.
+
+#### AddRequestFilters
+Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`.
+
+##### AuthenticationTypes
+Here we specify a list of Authentication types, that will be filtered out from the whole swagger file. This is where QA Tool Kit presents a convention.
+The built-in types are:
+- `AuthenticationType.Customer` which specifies a string `"@customer"`,
+- `AuthenticationType.Administrator` which specifies a string `"@administrator"`,
+- `AuthenticationType.Oauth2` which specifies a string `"@oauth2"`,
+- `AuthenticationType ApiKey` which specifies a string `"@apikey"`,
+- `AuthenticationType.Basic` which specifies a string `"@basic"`.
+
+In order to apply filters, you need to tag your API endpoints with those strings.
+
+We normally do it in Swagger endpoint description. An example might be: `Get categories from the system. @customer,@administrator,@oauth2.`
+
+This is an example from swagger.json excerpt:
+
+```json
+"/v{version}/categories?parent={parentId}": {
+    "get": {
+        "tags": [
+            "My endpoints"
+        ],
+        "summary": "Get categories",
+        "description": "Get Categories, optionally filtered by parentId. TEST TAGS -> [@customer,@administrator,@oauth2]",
+        "operationId": "GetCategories",
+```
+
+Parser then finds those string in the description field and populates the `RequestFilter` property.
+
+##### TestTypes
+Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in certain test scenarios. Currently libraray supports:
+
+- TestType.LoadTest which specifies a string `"@loadtest"`,
+- TestType.IntegrationTest which specifies a string `"@integrationtest"`,
+- TestType.SecurityTest which specifies a string `"@securitytest"`,
+
+The same swagger-json excerpt which allows load and integration tests.
+
+```json
+"/v{version}/categories?parent={parentId}": {
+    "get": {
+        "tags": [
+            "My endpoints"
+        ],
+        "summary": "Get categories",
+        "description": "Get Categories, optionally filtered by parentId. TEST TAGS -> [@loadtest,@integrationtest,@customer,@administrator,@oauth2]",
+        "operationId": "GetCategories",
+```
+
+##### EndpointNameWhitelist
+Final `RequestFilter` option is `EndpointNameWhitelist`. With it you can specify a list of endpoints that will be included in the results.
+
+Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. That corresponds to the `operationId` in the swagger file above.
+
+## TO-DO
+
+- Support for automatic model data generation.
+
+## License
 
 MIT License
 
