@@ -1,8 +1,6 @@
 # QAToolKit.Source.Swagger
 ![.NET Core](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
 
-## Description
-
 `QAToolKit.Source.Swagger` is a .NET standard library, which generates `IList<HttpTestRequest>` object that is the input for other components.
 
 Major features:
@@ -51,7 +49,9 @@ IList<HttpTestRequest> requests = await swaggerSource.Load(new Uri[] {
 
 The above code is quite simple, but it needs some explanation.
 
-#### AddReplacementValues
+## Description
+
+#### 1. AddReplacementValues
 This is a method that will add key/value pairs for replacement values you need to replace in the Swagger requests.
 
 In the example above we say: "Replace `{version}` placeholder in Path and URL parameters and JSON body models."
@@ -62,13 +62,13 @@ That, does not stop there, you can also populate JSON request bodies in this way
 
 [TODO sample JSON Body]
 
-#### AddBasicAuthentication
+#### 2. AddBasicAuthentication
 If your Swagger.json files are protected by basic authentication, you can set those with `AddBasicAuthentication`.
 
-#### AddRequestFilters
+#### 3, AddRequestFilters
 Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`.
 
-##### AuthenticationTypes
+##### 3.1. AuthenticationTypes
 Here we specify a list of Authentication types, that will be filtered out from the whole swagger file. This is where QA Tool Kit presents a convention.
 The built-in types are:
 - `AuthenticationType.Customer` which specifies a string `"@customer"`,
@@ -96,7 +96,7 @@ This is an example from swagger.json excerpt:
 
 Parser then finds those string in the description field and populates the `RequestFilter` property.
 
-##### TestTypes
+##### 3.2 TestTypes
 Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in certain test scenarios. Currently libraray supports:
 
 - TestType.LoadTest which specifies a string `"@loadtest"`,
@@ -116,7 +116,7 @@ The same swagger-json excerpt which allows load and integration tests.
         "operationId": "GetCategories",
 ```
 
-##### EndpointNameWhitelist
+##### 3.3 EndpointNameWhitelist
 Final `RequestFilter` option is `EndpointNameWhitelist`. With it you can specify a list of endpoints that will be included in the results.
 
 Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. That corresponds to the `operationId` in the swagger file above.
