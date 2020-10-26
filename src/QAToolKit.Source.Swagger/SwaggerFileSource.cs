@@ -8,10 +8,17 @@ using System.Threading.Tasks;
 
 namespace QAToolKit.Source.Swagger
 {
+    /// <summary>
+    /// Swagger file source
+    /// </summary>
     public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpTestRequest>>
     {
         private SwaggerOptions _swaggerOptions;
 
+        /// <summary>
+        /// New instance of swagger file source
+        /// </summary>
+        /// <param name="options"></param>
         public SwaggerFileSource(Action<SwaggerOptions> options = null)
         {
             _swaggerOptions = new SwaggerOptions();

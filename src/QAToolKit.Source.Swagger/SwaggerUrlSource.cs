@@ -11,10 +11,17 @@ using System.Threading.Tasks;
 
 namespace QAToolKit.Source.Swagger
 {
+    /// <summary>
+    /// Swagger Url source
+    /// </summary>
     public class SwaggerUrlSource : ITestSource<Uri[], IList<HttpTestRequest>>
     {
         private SwaggerOptions _swaggerOptions;
 
+        /// <summary>
+        /// Swagger Url source constructor
+        /// </summary>
+        /// <param name="options"></param>
         public SwaggerUrlSource(Action<SwaggerOptions> options = null)
         {
             _swaggerOptions = new SwaggerOptions();
@@ -25,7 +32,6 @@ namespace QAToolKit.Source.Swagger
         /// Load swagger files from the URL and apply loader settings if necessary
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="options"></param>
         /// <returns></returns>
         public async Task<IList<HttpTestRequest>> Load(Uri[] source)
         {

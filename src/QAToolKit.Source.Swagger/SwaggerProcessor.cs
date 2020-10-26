@@ -7,6 +7,9 @@ using System.Net.Http;
 
 namespace QAToolKit.Source.Swagger
 {
+    /// <summary>
+    /// Swagger processor
+    /// </summary>
     public class SwaggerProcessor
     {
         /// <summary>
