@@ -5,7 +5,7 @@ using Xunit;
 
 namespace QAToolKit.Source.Swagger.Test
 {
-    public class SwaggerUrlSourceTests
+    public class SwaggerUrlSourceIntegrationTests
     {
         [Fact]
         public async Task SwaggerUrlSourceWithoutOptionsV3Test_Successfull()

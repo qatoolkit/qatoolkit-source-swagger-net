@@ -1,5 +1,8 @@
 ﻿using QAToolKit.Core.Models;
+using System;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("QAToolKit.Source.Swagger.Test")]
 namespace QAToolKit.Source.Swagger
 {
     /// <summary>
@@ -31,6 +34,10 @@ namespace QAToolKit.Source.Swagger
         /// Swagger basic authentication password
         /// </summary>
         internal string Password { get; private set; }
+        /// <summary>
+        /// Set custom base API URL
+        /// </summary>
+        internal Uri BaseUrl { get; private set; }
 
         /// <summary>
         /// Add basic authentication
@@ -66,6 +73,17 @@ namespace QAToolKit.Source.Swagger
         public SwaggerOptions AddReplacementValues(ReplacementValue[] replacementValues)
         {
             ReplacementValues = replacementValues;
+            return this;
+        }
+
+        /// <summary>
+        /// Add base url
+        /// </summary>
+        /// <param name="baseUrl"></param>
+        /// <returns></returns>
+        public SwaggerOptions AddBaseUrl(Uri baseUrl)
+        {
+            BaseUrl = baseUrl;
             return this;
         }
     }

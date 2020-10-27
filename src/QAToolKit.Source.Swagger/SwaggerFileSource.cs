@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Writers;
 using QAToolKit.Core.Interfaces;
 using QAToolKit.Core.Models;
 using System;
@@ -13,7 +14,7 @@ namespace QAToolKit.Source.Swagger
     /// </summary>
     public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpTestRequest>>
     {
-        private SwaggerOptions _swaggerOptions;
+        private readonly SwaggerOptions _swaggerOptions;
 
         /// <summary>
         /// New instance of swagger file source
@@ -39,15 +40,23 @@ namespace QAToolKit.Source.Swagger
 
             foreach (var filePath in source)
             {
-                using (var fileStream = File.OpenRead(filePath.FullName))
+                using (FileStream SourceStream = File.OpenRead(filePath.FullName))
                 {
-                    var openApiDocument = new OpenApiStreamReader().Read(fileStream, out var diagnostic);
+                    var openApiDocument = new OpenApiStreamReader().Read(SourceStream, out var diagnostic);
 
-                    restRequests.AddRange(processor.MapFromOpenApiDocument(null, openApiDocument, _swaggerOptions.ReplacementValues));
+                    var textWritter = new OpenApiJsonWriter(new StringWriter());
+                    openApiDocument.SerializeAsV3(textWritter);
+
+                    restRequests.AddRange(processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument, _swaggerOptions.ReplacementValues));
                 }
             }
 
             return restRequests;
+        }
+
+        internal Task Load(FileInfo fileInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace QAToolKit.Source.Swagger
     /// </summary>
     public class SwaggerUrlSource : ITestSource<Uri[], IList<HttpTestRequest>>
     {
-        private SwaggerOptions _swaggerOptions;
+        private readonly SwaggerOptions _swaggerOptions;
 
         /// <summary>
         /// Swagger Url source constructor
@@ -76,7 +76,7 @@ namespace QAToolKit.Source.Swagger
             return restRequests;
         }
 
-        private List<HttpTestRequest> FilterRequests(IList<HttpTestRequest> requests, RequestFilter requestFilter)
+        private IList<HttpTestRequest> FilterRequests(IList<HttpTestRequest> requests, RequestFilter requestFilter)
         {
             var requestsLocal = new List<HttpTestRequest>();
 
