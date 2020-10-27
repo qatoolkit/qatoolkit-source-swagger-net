@@ -23,6 +23,20 @@ namespace QAToolKit.Source.Swagger
         {
             var requests = new List<HttpTestRequest>();
 
+            var server = openApiDocument.Servers.FirstOrDefault();
+            if (server != null)
+            {
+                var tempUri = new Uri(server.Url, UriKind.RelativeOrAbsolute);
+                if (tempUri.IsAbsoluteUri)
+                {
+                    baseUri = tempUri;
+                }
+                else
+                {
+                    baseUri = new Uri(baseUri, tempUri);
+                }
+            }
+
             foreach (var path in openApiDocument.Paths)
             {
                 requests.AddRange(GetRestRequestsForPath(baseUri, path, replacementValues));
@@ -46,7 +60,7 @@ namespace QAToolKit.Source.Swagger
                     Description = GetDescription(operation),
                     OperationId = GetOperationId(operation),
                     Parameters = ReplaceUrlParameters(GetParameters(operation).ToList(), replacementValues).ToList(),
-                    RequestBody = ReplaceRequestBodyModel(GetRequestBody(operation), replacementValues),
+                    RequestBodies = ReplaceRequestBodyModel(GetRequestBodies(operation), replacementValues),
                     Responses = GetResponses(operation),
                     Tags = GetTags(operation),
                     AuthenticationTypes = GetAuthenticationTypes(operation),
@@ -128,9 +142,12 @@ namespace QAToolKit.Source.Swagger
 
         private string ReplacePathParameters(string path, ReplacementValue[] replacementValues)
         {
-            foreach (var replacementValue in replacementValues)
+            if (replacementValues != null)
             {
-                path = path.Replace("{" + replacementValue.Key + "}", replacementValue.Value);
+                foreach (var replacementValue in replacementValues)
+                {
+                    path = path.Replace("{" + replacementValue.Key + "}", replacementValue.Value);
+                }
             }
 
             return path;
@@ -195,13 +212,16 @@ namespace QAToolKit.Source.Swagger
 
         private IList<Parameter> ReplaceUrlParameters(List<Parameter> urlParameters, ReplacementValue[] replacementValues)
         {
-            foreach (var replacementValue in replacementValues)
+            if (replacementValues != null)
             {
-                foreach (var parameter in urlParameters)
+                foreach (var replacementValue in replacementValues)
                 {
-                    if (parameter.Name == replacementValue.Key)
+                    foreach (var parameter in urlParameters)
                     {
-                        parameter.Value = replacementValue.Value;
+                        if (parameter.Name == replacementValue.Key)
+                        {
+                            parameter.Value = replacementValue.Value;
+                        }
                     }
                 }
             }
@@ -209,79 +229,90 @@ namespace QAToolKit.Source.Swagger
             return urlParameters;
         }
 
-        private RequestBody GetRequestBody(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
+        private List<RequestBody> GetRequestBodies(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
         {
             try
             {
+                var requests = new List<RequestBody>();
+
                 if (openApiOperation.Value.RequestBody == null)
                 {
-                    return new RequestBody();
+                    return new List<RequestBody>();
                 }
 
                 if (openApiOperation.Value.RequestBody.Content.Count == 0)
                 {
-                    return new RequestBody();
+                    return new List<RequestBody>();
                 }
 
-                if (openApiOperation.Value.RequestBody.Content.FirstOrDefault().Value.Schema.Properties.Count == 0)
+                foreach (var contentType in openApiOperation.Value.RequestBody.Content)
                 {
-                    return new RequestBody();
-                }
-
-                var requestBody = new RequestBody
-                {
-                    Name = openApiOperation.Value.RequestBody.Content.FirstOrDefault().Value.Schema.Reference.Id,
-                    Properties = new List<Property>()
-                };
-
-                foreach (var property in openApiOperation.Value.RequestBody.Content.FirstOrDefault().Value.Schema.Properties)
-                {
-                    requestBody.Properties.Add(new Property()
+                    var requestBody = new RequestBody
                     {
-                        Name = property.Key,
-                        Description = property.Value.Description,
-                        Type = property.Value.Type,
-                    });
+                        Name = contentType.Value.Schema.Reference != null ? contentType.Value.Schema.Reference.Id : "N/A",
+                        ContentType = contentType.Key,
+                        Properties = new List<Property>()
+                    };
+
+                    foreach (var property in contentType.Value.Schema.Properties)
+                    {
+                        requestBody.Properties.Add(new Property()
+                        {
+                            Name = property.Key,
+                            Description = property.Value.Description,
+                            Type = property.Value.Type,
+                        });
+                    }
+
+                    requests.Add(requestBody);
                 }
 
-                return requestBody;
+                return requests;
             }
             catch (Exception ex)
             {
                 var msg = ex.Message;
-                return new RequestBody();
+                return new List<RequestBody>();
             }
         }
 
-        private RequestBody ReplaceRequestBodyModel(RequestBody requestBody, ReplacementValue[] replacementValues)
+        private List<RequestBody> ReplaceRequestBodyModel(List<RequestBody> requestBodies, ReplacementValue[] replacementValues)
         {
-            if (requestBody.Properties == null)
-            {
-                return requestBody;
-            }
 
-            var requestBodyResult = new RequestBody
+            foreach (var requestBody in requestBodies)
             {
-                Name = requestBody.Name
-            };
-
-            foreach (var replacementValue in replacementValues)
-            {
-                var prop = requestBody.Properties.FirstOrDefault(p => p.Name == replacementValue.Key);
-
-                if (prop != null)
+                if (requestBody.Properties == null)
                 {
-                    requestBodyResult.Properties.Add(new Property()
+                    continue;
+                }
+
+                var requestBodyResult = new RequestBody
+                {
+                    Name = requestBody.Name,
+                    Properties = new List<Property>()
+                };
+
+                if (replacementValues != null)
+                {
+                    foreach (var replacementValue in replacementValues)
                     {
-                        Description = prop.Description,
-                        Name = prop.Name,
-                        Type = prop.Type,
-                        Value = replacementValue.Value
-                    });
+                        var prop = requestBody.Properties.FirstOrDefault(p => p.Name == replacementValue.Key);
+
+                        if (prop != null)
+                        {
+                            requestBodyResult.Properties.Add(new Property()
+                            {
+                                Description = prop.Description,
+                                Name = prop.Name,
+                                Type = prop.Type,
+                                Value = replacementValue.Value
+                            });
+                        }
+                    }
                 }
             }
 
-            return requestBodyResult;
+            return requestBodies;
         }
 
         private List<Response> GetResponses(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)

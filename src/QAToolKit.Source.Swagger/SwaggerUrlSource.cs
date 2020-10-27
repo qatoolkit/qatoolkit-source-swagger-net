@@ -1,8 +1,10 @@
 ﻿using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Writers;
 using QAToolKit.Core.Interfaces;
 using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -55,6 +57,8 @@ namespace QAToolKit.Source.Swagger
                     var stream = await httpClient.GetStreamAsync(uri);
 
                     var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
+                    var textWritter = new OpenApiJsonWriter(new StringWriter());
+                    openApiDocument.SerializeAsV3(textWritter);
 
                     var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument, _swaggerOptions.ReplacementValues);
 
@@ -81,12 +85,12 @@ namespace QAToolKit.Source.Swagger
                 requestsLocal.AddRange(requests.Where(request => requestFilter.AuthenticationTypes.ToList().Any(x => x == request.AuthenticationTypes)));
             }
 
-            if (requestFilter.EndpointNameWhitelist != null)
+            if (requestFilter.TestTypes != null)
             {
                 requestsLocal.AddRange(requests.Where(request => requestFilter.TestTypes.ToList().Any(x => x == request.TestTypes)));
             }
 
-            if (requestFilter.TestTypes != null)
+            if (requestFilter.EndpointNameWhitelist != null)
             {
                 requestsLocal.AddRange(requests.Where(request => requestFilter.EndpointNameWhitelist.Any(x => x == request.OperationId)));
             }
