@@ -35,6 +35,8 @@ namespace QAToolKit.Source.Swagger
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
+            if (_swaggerOptions.BaseUrl == null) throw new Exception("Swagger from file source needs BaseUrl defined. If absolute URL is defined in swagger file, that one will be used.");
+
             var restRequests = new List<HttpTestRequest>();
             var processor = new SwaggerProcessor();
 
@@ -52,11 +54,6 @@ namespace QAToolKit.Source.Swagger
             }
 
             return restRequests;
-        }
-
-        internal Task Load(FileInfo fileInfo)
-        {
-            throw new NotImplementedException();
         }
     }
 }

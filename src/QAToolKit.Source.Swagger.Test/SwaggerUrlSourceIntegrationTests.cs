@@ -46,6 +46,16 @@ namespace QAToolKit.Source.Swagger.Test
             Assert.NotNull(requests);
         }
 
+        [Fact]
+        public async Task SwaggerUrlSourceWithoutUrlV3Test_Fails()
+        {
+            var urlSource = new SwaggerUrlSource();
+            await Assert.ThrowsAsync<UriFormatException>(async () => await urlSource.Load(
+                new Uri[]
+                {
+                      new Uri("")
+                }));
+        }
 
         /* [Fact]
          public async Task SwaggerUrlSourceWithoutOptionsV2Test_Successfull()
