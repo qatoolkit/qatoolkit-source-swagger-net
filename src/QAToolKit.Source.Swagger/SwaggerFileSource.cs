@@ -49,7 +49,16 @@ namespace QAToolKit.Source.Swagger
                     var textWritter = new OpenApiJsonWriter(new StringWriter());
                     openApiDocument.SerializeAsV3(textWritter);
 
-                    restRequests.AddRange(processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument, _swaggerOptions.ReplacementValues));
+                    var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument, _swaggerOptions.ReplacementValues);
+
+                    if (_swaggerOptions.UseRequestFilter)
+                    {
+                        restRequests.AddRange(SwaggerRequestFilter.FilterRequests(requests, _swaggerOptions.RequestFilter));
+                    }
+                    else
+                    {
+                        restRequests.AddRange(requests);
+                    }
                 }
             }
 

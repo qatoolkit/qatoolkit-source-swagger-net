@@ -46,7 +46,6 @@ namespace QAToolKit.Source.Swagger
             {
                 using (var httpClient = new HttpClient())
                 {
-
                     if (_swaggerOptions.UseBasicAuth)
                     {
                         var authenticationString = $"{_swaggerOptions.UserName}:{_swaggerOptions.Password}";
@@ -64,7 +63,7 @@ namespace QAToolKit.Source.Swagger
 
                     if (_swaggerOptions.UseRequestFilter)
                     {
-                        restRequests.AddRange(FilterRequests(requests, _swaggerOptions.RequestFilter));
+                        restRequests.AddRange(SwaggerRequestFilter.FilterRequests(requests, _swaggerOptions.RequestFilter));
                     }
                     else
                     {
@@ -76,26 +75,6 @@ namespace QAToolKit.Source.Swagger
             return restRequests;
         }
 
-        private IList<HttpTestRequest> FilterRequests(IList<HttpTestRequest> requests, RequestFilter requestFilter)
-        {
-            var requestsLocal = new List<HttpTestRequest>();
 
-            if (requestFilter.AuthenticationTypes != null)
-            {
-                requestsLocal.AddRange(requests.Where(request => requestFilter.AuthenticationTypes.ToList().Any(x => x == request.AuthenticationTypes)));
-            }
-
-            if (requestFilter.TestTypes != null)
-            {
-                requestsLocal.AddRange(requests.Where(request => requestFilter.TestTypes.ToList().Any(x => x == request.TestTypes)));
-            }
-
-            if (requestFilter.EndpointNameWhitelist != null)
-            {
-                requestsLocal.AddRange(requests.Where(request => requestFilter.EndpointNameWhitelist.Any(x => x == request.OperationId)));
-            }
-
-            return requestsLocal.ToList();
-        }
     }
 }
