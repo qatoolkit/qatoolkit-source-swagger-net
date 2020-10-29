@@ -10,6 +10,7 @@ Major features:
 - path parameters, URL paramters and JSON body models are replaced with custom values,
 - access swagger.json from URL, which is protected by `basic authentication`,
 - control which swagger endpoints are called by specifying `request filters` (check below)
+- data generation for missing values (Experimental)
 
 ## Sample
 
@@ -38,6 +39,8 @@ SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
             TestTypes = new List<TestType>() { TestType.LoadTest },
             EndpointNameWhitelist = new string[] { "GetCategories" }
         });
+        options.AddBaseUrl(new Uri("https://dev.myapi.com"));
+        options.AddDataGeneration();
     });
 
 //To run the Swagger parser we need to pass an array of URLs
@@ -61,6 +64,8 @@ In other words, if you have a test API endpoint like this: https://api.demo.com/
 That, does not stop there, you can also populate JSON request bodies in this way:
 
 [TODO sample JSON Body]
+
+`ReplcementValue[]` has precedence over data generation (check below chapter 5).
 
 #### 2. AddBasicAuthentication
 If your Swagger.json files are protected by basic authentication, you can set those with `AddBasicAuthentication`.
@@ -119,11 +124,28 @@ The same swagger-json excerpt which allows load and integration tests.
 ##### 3.3 EndpointNameWhitelist
 Final `RequestFilter` option is `EndpointNameWhitelist`. With it you can specify a list of endpoints that will be included in the results.
 
-Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. That corresponds to the `operationId` in the swagger file above.
+Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. 
+That corresponds to the `operationId` in the swagger file above.
+
+#### 4. AddBaseUrl
+Your swagger file has a `Server section`, where you can specify an server URI and can be absolute or relative. An example of relative server section is:
+```json
+"servers": [
+    {
+        "url": "/api/v3"
+    }
+],
+```
+In case of relative paths you need to add an absolute base URL to `Swagger Processor` with `AddBaseUrl`, otherwise the one from the `Servers section` will be used.
+
+#### 5. AddDataGeneration
+##### !! EXPERIMENTAL !!
+This is an experimental feature. It will generate the missing data in the `List<HttpTestRequest>` object from the swagger models, uri and query parameters.
+`ReplcementValue[]` has precedence over data generation.
 
 ## TO-DO
 
-- Support for automatic model data generation.
+N/A
 
 ## License
 

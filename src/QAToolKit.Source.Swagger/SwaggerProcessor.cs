@@ -36,6 +36,11 @@ namespace QAToolKit.Source.Swagger
                 }
                 else
                 {
+                    if(baseUri == null)
+                    {
+                        throw new Exception("Swagger from file source needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
+                    }
+
                     baseUri = new Uri(baseUri, tempUri);
                 }
             }
