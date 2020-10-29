@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace QAToolKit.Source.Swagger.Test
@@ -88,12 +87,37 @@ namespace QAToolKit.Source.Swagger.Test
         }
 
         [Fact]
-        public void SwaggerAddBaseUrlRequestFiltersTest_Successful()
+        public void SwaggerAddBaseUrlOnRequestFiltersTest_Successful()
         {
             var options = new SwaggerOptions();
             options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
 
             Assert.Equal("https://petstore3.swagger.io/", options.BaseUrl.ToString());
+        }
+
+        [Fact]
+        public void SwaggerAddBaseUrlOffRequestFiltersTest_Successful()
+        {
+            var options = new SwaggerOptions();
+
+            Assert.Null(options.BaseUrl);
+        }
+
+        [Fact]
+        public void SwaggerAddDataGenerationOnRequestFiltersTest_Successful()
+        {
+            var options = new SwaggerOptions();
+            options.AddDataGeneration();
+
+            Assert.True(options.UseDataGeneration);
+        }
+
+        [Fact]
+        public void SwaggerAddDataGenerationOffRequestFiltersTest_Successful()
+        {
+            var options = new SwaggerOptions();
+
+            Assert.False(options.UseDataGeneration);
         }
     }
 }
