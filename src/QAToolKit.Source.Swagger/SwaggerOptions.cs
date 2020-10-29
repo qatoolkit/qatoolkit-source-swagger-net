@@ -38,6 +38,10 @@ namespace QAToolKit.Source.Swagger
         /// Set custom base API URL
         /// </summary>
         internal Uri BaseUrl { get; private set; }
+        /// <summary>
+        /// Should data be automatically generated
+        /// </summary>
+        internal bool UseDataGeneration { get; private set; } = false;
 
         /// <summary>
         /// Add basic authentication
@@ -84,6 +88,16 @@ namespace QAToolKit.Source.Swagger
         public SwaggerOptions AddBaseUrl(Uri baseUrl)
         {
             BaseUrl = baseUrl;
+            return this;
+        }
+
+        /// <summary>
+        /// Add data generation to the Swagger processor
+        /// </summary>
+        /// <returns></returns>
+        public SwaggerOptions AddDataGeneration()
+        {
+            UseDataGeneration = true;
             return this;
         }
     }

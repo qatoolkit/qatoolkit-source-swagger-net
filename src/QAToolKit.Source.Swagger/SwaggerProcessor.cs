@@ -1,7 +1,11 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Writers;
 using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 
@@ -17,9 +21,8 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="baseUri"></param>
         /// <param name="openApiDocument"></param>
-        /// <param name="replacementValues"></param>
         /// <returns></returns>
-        public IList<HttpTestRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument, ReplacementValue[] replacementValues)
+        public IList<HttpTestRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
         {
             var requests = new List<HttpTestRequest>();
 
@@ -39,13 +42,13 @@ namespace QAToolKit.Source.Swagger
 
             foreach (var path in openApiDocument.Paths)
             {
-                requests.AddRange(GetRestRequestsForPath(baseUri, path, replacementValues));
+                requests.AddRange(GetRestRequestsForPath(baseUri, path));
             }
 
             return requests;
         }
 
-        private IList<HttpTestRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path, ReplacementValue[] replacementValues)
+        private IList<HttpTestRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
         {
             var requests = new List<HttpTestRequest>();
 
@@ -54,13 +57,13 @@ namespace QAToolKit.Source.Swagger
                 requests.Add(new HttpTestRequest()
                 {
                     BasePath = baseUri.ToString(),
-                    Path = ReplacePathParameters(GetPath(path.Key), replacementValues),
+                    Path = GetPath(path.Key),
                     Method = GetHttpMethod(operation),
                     Summary = GetSummary(operation),
                     Description = GetDescription(operation),
                     OperationId = GetOperationId(operation),
-                    Parameters = ReplaceUrlParameters(GetParameters(operation).ToList(), replacementValues).ToList(),
-                    RequestBodies = ReplaceRequestBodyModel(GetRequestBodies(operation), replacementValues),
+                    Parameters = GetParameters(operation).ToList().ToList(),
+                    RequestBodies = GetRequestBodies(operation),
                     Responses = GetResponses(operation),
                     Tags = GetTags(operation),
                     AuthenticationTypes = GetAuthenticationTypes(operation),
@@ -71,7 +74,7 @@ namespace QAToolKit.Source.Swagger
             return requests;
         }
 
-        private IEnumerable<TestType> GetTestTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
+        private List<TestType> GetTestTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
             var testType = new List<TestType>();
 
@@ -98,7 +101,7 @@ namespace QAToolKit.Source.Swagger
             return testType;
         }
 
-        private IEnumerable<AuthenticationType> GetAuthenticationTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
+        private List<AuthenticationType> GetAuthenticationTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
             var authenticationTypes = new List<AuthenticationType>();
 
@@ -137,19 +140,6 @@ namespace QAToolKit.Source.Swagger
 
         private string GetPath(string path)
         {
-            return path;
-        }
-
-        private string ReplacePathParameters(string path, ReplacementValue[] replacementValues)
-        {
-            if (replacementValues != null)
-            {
-                foreach (var replacementValue in replacementValues)
-                {
-                    path = path.Replace("{" + replacementValue.Key + "}", replacementValue.Value);
-                }
-            }
-
             return path;
         }
 
@@ -210,25 +200,6 @@ namespace QAToolKit.Source.Swagger
             return parameters;
         }
 
-        private IList<Parameter> ReplaceUrlParameters(List<Parameter> urlParameters, ReplacementValue[] replacementValues)
-        {
-            if (replacementValues != null)
-            {
-                foreach (var replacementValue in replacementValues)
-                {
-                    foreach (var parameter in urlParameters)
-                    {
-                        if (parameter.Name == replacementValue.Key)
-                        {
-                            parameter.Value = replacementValue.Value;
-                        }
-                    }
-                }
-            }
-
-            return urlParameters;
-        }
-
         private List<RequestBody> GetRequestBodies(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
         {
             try
@@ -247,24 +218,19 @@ namespace QAToolKit.Source.Swagger
 
                 foreach (var contentType in openApiOperation.Value.RequestBody.Content)
                 {
-                    var requestBody = new RequestBody
+                    var RequestBody = new RequestBody
                     {
-                        Name = contentType.Value.Schema.Reference != null ? contentType.Value.Schema.Reference.Id : "N/A",
-                        ContentType = contentType.Key,
+                        Name = contentType.Value.Schema.Reference != null ? contentType.Value.Schema.Reference.Id : null,
+                        ContentType = ContentType.FromString(contentType.Key),
                         Properties = new List<Property>()
                     };
 
-                    foreach (var property in contentType.Value.Schema.Properties)
+                    foreach (KeyValuePair<string, OpenApiSchema> property in contentType.Value.Schema.Properties)
                     {
-                        requestBody.Properties.Add(new Property()
-                        {
-                            Name = property.Key,
-                            Description = property.Value.Description,
-                            Type = property.Value.Type,
-                        });
+                        RequestBody.Properties.AddRange(GetPropertiesRecursively(property));
                     }
 
-                    requests.Add(requestBody);
+                    requests.Add(RequestBody);
                 }
 
                 return requests;
@@ -276,43 +242,78 @@ namespace QAToolKit.Source.Swagger
             }
         }
 
-        private List<RequestBody> ReplaceRequestBodyModel(List<RequestBody> requestBodies, ReplacementValue[] replacementValues)
+
+        private static List<Property> GetPropertiesRecursively(KeyValuePair<string, OpenApiSchema> source)
         {
+            var properties = new List<Property>();
+            Property itemsProperty = null;
 
-            foreach (var requestBody in requestBodies)
+            if (source.Value.Items != null)
             {
-                if (requestBody.Properties == null)
+                itemsProperty = new Property
                 {
-                    continue;
-                }
-
-                var requestBodyResult = new RequestBody
-                {
-                    Name = requestBody.Name,
-                    Properties = new List<Property>()
+                    Description = source.Value.Items.Description,
+                    Format = source.Value.Items.Description,
+                    Type = source.Value.Items.Type,
+                    Properties = new List<Property>(),
+                    Name = source.Value.Items.Reference != null ? source.Value.Items.Reference.Id : null
                 };
+                itemsProperty.Value = SetValue(source.Value.Items.Example);
 
-                if (replacementValues != null)
+                foreach (var property in source.Value.Items.Properties)
                 {
-                    foreach (var replacementValue in replacementValues)
-                    {
-                        var prop = requestBody.Properties.FirstOrDefault(p => p.Name == replacementValue.Key);
+                    var recursiveProperties = GetPropertiesRecursively(property);
 
-                        if (prop != null)
-                        {
-                            requestBodyResult.Properties.Add(new Property()
-                            {
-                                Description = prop.Description,
-                                Name = prop.Name,
-                                Type = prop.Type,
-                                Value = replacementValue.Value
-                            });
-                        }
-                    }
+                    if (recursiveProperties != null)
+                        itemsProperty.Properties.AddRange(recursiveProperties);
                 }
             }
 
-            return requestBodies;
+            var prop = new Property
+            {
+                Name = source.Value.Reference != null ? source.Value.Reference.Id : source.Key,
+                Description = source.Value.Description,
+                Type = source.Value.Type,
+                Format = source.Value.Format,
+                Properties = new List<Property>(),
+                Items = itemsProperty
+            };
+            prop.Value = SetValue(source.Value.Example);
+
+            foreach (var property in source.Value.Properties)
+            {
+                var propsTem = GetPropertiesRecursively(property);
+
+                if (propsTem != null)
+                    prop.Properties.AddRange(propsTem);
+            }
+
+            properties.Add(prop);
+
+            return properties;
+        }
+
+        private static string SetValue(IOpenApiAny value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            using (var outputString = new StringWriter())
+            {
+                var writer = new OpenApiJsonWriter(outputString);
+                value.Write(writer, Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0);
+
+                string exampleString = outputString.ToString();
+
+                if (exampleString != null)
+                {
+                    return exampleString;
+                }
+            }
+
+            return null;
         }
 
         private List<Response> GetResponses(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)

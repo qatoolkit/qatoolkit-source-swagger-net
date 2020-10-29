@@ -5,7 +5,6 @@ using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -46,7 +45,6 @@ namespace QAToolKit.Source.Swagger
             {
                 using (var httpClient = new HttpClient())
                 {
-
                     if (_swaggerOptions.UseBasicAuth)
                     {
                         var authenticationString = $"{_swaggerOptions.UserName}:{_swaggerOptions.Password}";
@@ -60,42 +58,31 @@ namespace QAToolKit.Source.Swagger
                     var textWritter = new OpenApiJsonWriter(new StringWriter());
                     openApiDocument.SerializeAsV3(textWritter);
 
-                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument, _swaggerOptions.ReplacementValues);
+                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
 
                     if (_swaggerOptions.UseRequestFilter)
                     {
-                        restRequests.AddRange(FilterRequests(requests, _swaggerOptions.RequestFilter));
+                        var filters = new SwaggerRequestFilter(requests);
+                        requests = filters.FilterRequests(_swaggerOptions.RequestFilter);
                     }
-                    else
+
+                    if (_swaggerOptions.UseDataGeneration)
                     {
-                        restRequests.AddRange(requests);
+                        var generator = new SwaggerDataGenerator(requests);
+                        requests = generator.GenerateModelValues();
                     }
+
+                    if (_swaggerOptions.ReplacementValues != null)
+                    {
+                        var generator = new SwaggerValueReplacement(requests, _swaggerOptions.ReplacementValues);
+                        requests = generator.ReplaceAll();
+                    }
+
+                    restRequests.AddRange(requests);
                 }
             }
 
             return restRequests;
-        }
-
-        private IList<HttpTestRequest> FilterRequests(IList<HttpTestRequest> requests, RequestFilter requestFilter)
-        {
-            var requestsLocal = new List<HttpTestRequest>();
-
-            if (requestFilter.AuthenticationTypes != null)
-            {
-                requestsLocal.AddRange(requests.Where(request => requestFilter.AuthenticationTypes.ToList().Any(x => x == request.AuthenticationTypes)));
-            }
-
-            if (requestFilter.TestTypes != null)
-            {
-                requestsLocal.AddRange(requests.Where(request => requestFilter.TestTypes.ToList().Any(x => x == request.TestTypes)));
-            }
-
-            if (requestFilter.EndpointNameWhitelist != null)
-            {
-                requestsLocal.AddRange(requests.Where(request => requestFilter.EndpointNameWhitelist.Any(x => x == request.OperationId)));
-            }
-
-            return requestsLocal.ToList();
         }
     }
 }
