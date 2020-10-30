@@ -47,25 +47,7 @@ namespace QAToolKit.Source.Swagger
                     var textWritter = new OpenApiJsonWriter(new StringWriter());
                     openApiDocument.SerializeAsV3(textWritter);
 
-                    var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument);
-
-                    if (_swaggerOptions.UseRequestFilter)
-                    {
-                        var filters = new SwaggerRequestFilter(requests);
-                        requests = filters.FilterRequests(_swaggerOptions.RequestFilter);
-                    }
-
-                    if (_swaggerOptions.UseDataGeneration)
-                    {
-                        var generator = new SwaggerDataGenerator(requests);
-                        requests = generator.GenerateModelValues();
-                    }
-
-                    if (_swaggerOptions.ReplacementValues != null)
-                    {
-                        var generator = new SwaggerValueReplacement(requests, _swaggerOptions.ReplacementValues);
-                        requests = generator.ReplaceAll();
-                    }
+                    var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument, _swaggerOptions);
 
                     restRequests.AddRange(requests);
                 }

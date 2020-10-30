@@ -63,7 +63,7 @@ namespace QAToolKit.Source.Swagger
                     property.Value = Faker.Lorem.Sentence(1);
                     break;
                 case "array":
-                    foreach (var prop in property.Items.Properties)
+                    foreach (var prop in property.Properties)
                     {
                         prop.Value = Faker.Lorem.Sentence(1);
                     }

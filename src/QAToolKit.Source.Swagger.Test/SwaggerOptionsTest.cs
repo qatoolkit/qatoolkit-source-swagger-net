@@ -1,13 +1,24 @@
-﻿using QAToolKit.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace QAToolKit.Source.Swagger.Test
 {
     public class SwaggerOptionsTest
     {
+        private readonly ILogger<SwaggerOptionsTest> _logger;
+
+        public SwaggerOptionsTest(ITestOutputHelper testOutputHelper)
+        {
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
+            _logger = loggerFactory.CreateLogger<SwaggerOptionsTest>();
+        }
+
         [Fact]
         public void SwaggerBasicAuthTest_Successful()
         {

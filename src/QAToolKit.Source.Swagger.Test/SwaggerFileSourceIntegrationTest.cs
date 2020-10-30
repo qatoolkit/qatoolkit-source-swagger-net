@@ -1,13 +1,24 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace QAToolKit.Source.Swagger.Test
 {
     public class SwaggerFileSourceIntegrationTest
     {
+        private readonly ILogger<SwaggerFileSourceIntegrationTest> _logger;
+
+        public SwaggerFileSourceIntegrationTest(ITestOutputHelper testOutputHelper)
+        {
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
+            _logger = loggerFactory.CreateLogger<SwaggerFileSourceIntegrationTest>();
+        }
+
         [Fact]
         public async void SwaggerFileSourceWithOptionsTest_Successfull()
         {
@@ -17,7 +28,7 @@ namespace QAToolKit.Source.Swagger.Test
             });
 
             var requests = await fileSource.Load(new List<FileInfo>() {
-                new FileInfo("Assets/swagger-test.json")
+                new FileInfo("Assets/swagger-pets-test.json")
             });
 
             Assert.NotNull(requests);
@@ -29,9 +40,11 @@ namespace QAToolKit.Source.Swagger.Test
         {
             var fileSource = new SwaggerFileSource();
 
-            await Assert.ThrowsAsync<Exception>(async () => await fileSource.Load(new List<FileInfo>() {
-                new FileInfo("Assets/swagger-test.json")
+            var exception = await Assert.ThrowsAsync<Exception>(async () => await fileSource.Load(new List<FileInfo>() {
+                new FileInfo("Assets/swagger-pets-test.json")
             }));
+
+            _logger.LogInformation(exception.Message);
         }
     }
 }

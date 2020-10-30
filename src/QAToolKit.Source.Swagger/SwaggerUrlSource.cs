@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Writers;
+using Newtonsoft.Json;
 using QAToolKit.Core.Interfaces;
 using QAToolKit.Core.Models;
 using System;
@@ -58,29 +59,16 @@ namespace QAToolKit.Source.Swagger
                     var textWritter = new OpenApiJsonWriter(new StringWriter());
                     openApiDocument.SerializeAsV3(textWritter);
 
-                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
-
-                    if (_swaggerOptions.UseRequestFilter)
-                    {
-                        var filters = new SwaggerRequestFilter(requests);
-                        requests = filters.FilterRequests(_swaggerOptions.RequestFilter);
-                    }
-
-                    if (_swaggerOptions.UseDataGeneration)
-                    {
-                        var generator = new SwaggerDataGenerator(requests);
-                        requests = generator.GenerateModelValues();
-                    }
-
-                    if (_swaggerOptions.ReplacementValues != null)
-                    {
-                        var generator = new SwaggerValueReplacement(requests, _swaggerOptions.ReplacementValues);
-                        requests = generator.ReplaceAll();
-                    }
+                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument, _swaggerOptions);
 
                     restRequests.AddRange(requests);
                 }
             }
+
+            File.WriteAllText("d:\\ddddd.json", JsonConvert.SerializeObject(restRequests, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented
+            }));
 
             return restRequests;
         }

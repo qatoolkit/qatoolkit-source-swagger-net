@@ -143,9 +143,10 @@ In case of relative paths you need to add an absolute base URL to `Swagger Proce
 This is an experimental feature. It will generate the missing data in the `List<HttpTestRequest>` object from the swagger models, uri and query parameters.
 `ReplcementValue[]` has precedence over data generation.
 
-## TO-DO
+## Limitations
 
-N/A
+- Swagger processor only returns `application/json` content type. Support for other might come later.
+- Data generation and replacement is only supported for Path, Url and Json Body properties.
 
 ## License
 

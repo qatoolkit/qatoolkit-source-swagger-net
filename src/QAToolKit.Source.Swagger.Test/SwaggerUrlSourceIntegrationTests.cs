@@ -1,12 +1,23 @@
-﻿using QAToolKit.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using QAToolKit.Core.Models;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace QAToolKit.Source.Swagger.Test
 {
     public class SwaggerUrlSourceIntegrationTests
     {
+        private readonly ILogger<SwaggerUrlSourceIntegrationTests> _logger;
+
+        public SwaggerUrlSourceIntegrationTests(ITestOutputHelper testOutputHelper)
+        {
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
+            _logger = loggerFactory.CreateLogger<SwaggerUrlSourceIntegrationTests>();
+        }
+
         [Fact]
         public async Task SwaggerUrlSourceWithoutOptionsV3Test_Successfull()
         {
@@ -28,7 +39,7 @@ namespace QAToolKit.Source.Swagger.Test
               {
                   options.AddRequestFilters(new RequestFilter()
                   {
-                      EndpointNameWhitelist = new string[] { "getPetById" }
+                      EndpointNameWhitelist = new string[] { "getPetById", "addPet" }
                   });
                   options.AddReplacementValues(new ReplacementValue[] {
               new ReplacementValue()
@@ -56,18 +67,5 @@ namespace QAToolKit.Source.Swagger.Test
                       new Uri("")
                 }));
         }
-
-        /* [Fact]
-         public async Task SwaggerUrlSourceWithoutOptionsV2Test_Successfull()
-         {
-             var urlSource = new SwaggerUrlSource();
-             var requests = await urlSource.Load(
-                 new Uri[]
-                 {
-                       new Uri("https://petstore.swagger.io/v2/swagger.json"),
-                 });
-
-             Assert.NotNull(requests);
-         }*/
     }
 }
