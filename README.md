@@ -8,7 +8,7 @@ Major features:
 - Parses `OpenAPI v3.0` Swagger files,
 - swagger.json can be loaded from `disk` or from `URL`,
 - access swagger.json from URL, which is protected by `basic authentication`,
-- control which swagger endpoints are called by specifying `request filters` (check below)
+- control which swagger endpoints are returned by specifying `request filters` (check below)
 
 ## Sample
 
@@ -45,7 +45,7 @@ The above code is quite simple, but it needs some explanation.
 If your Swagger.json files are protected by basic authentication, you can set those with `AddBasicAuthentication`.
 
 #### 2. AddRequestFilters
-Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`.
+Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`. All are optional.
 
 ##### 2.1. AuthenticationTypes
 Here we specify a list of Authentication types, that will be filtered out from the whole swagger file. This is where QA Tool Kit presents a convention.
@@ -58,7 +58,7 @@ The built-in types are:
 
 In order to apply filters, you need to tag your API endpoints with those strings.
 
-We normally do it in Swagger endpoint description. An example might be: `Get categories from the system. @customer,@administrator,@oauth2.`
+We normally do that, by adding the tags in the Swagger endpoint description. An example might be: `Get categories from the system. @customer,@administrator,@oauth2.`
 
 This is an example from swagger.json excerpt:
 
@@ -76,13 +76,13 @@ This is an example from swagger.json excerpt:
 Parser then finds those string in the description field and populates the `RequestFilter` property.
 
 ##### 2.2 TestTypes
-Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in certain test scenarios. Currently libraray supports:
+Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in different test scenarios. Currently library supports:
 
 - TestType.LoadTest which specifies a string `"@loadtest"`,
 - TestType.IntegrationTest which specifies a string `"@integrationtest"`,
 - TestType.SecurityTest which specifies a string `"@securitytest"`,
 
-The same swagger-json excerpt which allows load and integration tests.
+The same swagger.json excerpt which support test type tags might look like this:
 
 ```json
 "/v{version}/categories?parent={parentId}": {
@@ -94,6 +94,8 @@ The same swagger-json excerpt which allows load and integration tests.
         "description": "Get Categories, optionally filtered by parentId. TEST TAGS -> [@loadtest,@integrationtest,@customer,@administrator,@oauth2]",
         "operationId": "GetCategories",
 ```
+
+If you feed the list of `HttpRequest` objects with load type tags to the library like `QAToolKit.Engine.Bombardier`, only those requests will be tested.
 
 ##### 2.3 EndpointNameWhitelist
 Final `RequestFilter` option is `EndpointNameWhitelist`. With it you can specify a list of endpoints that will be included in the results.
