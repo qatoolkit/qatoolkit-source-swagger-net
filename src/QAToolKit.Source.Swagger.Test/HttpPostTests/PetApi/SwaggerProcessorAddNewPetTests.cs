@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using QAToolKit.Core.Models;
-using QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get;
 using QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post;
 using System;
 using System.Collections.Generic;

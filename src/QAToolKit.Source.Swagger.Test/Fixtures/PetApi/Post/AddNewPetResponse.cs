@@ -1,8 +1,6 @@
 ﻿using QAToolKit.Core.Models;
 using QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get.Helpers;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post
 {
