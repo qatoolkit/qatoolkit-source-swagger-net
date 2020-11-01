@@ -294,12 +294,12 @@ namespace QAToolKit.Source.Swagger
 
                 //TODO: support other content types
                 foreach (var contentType in openApiOperation.Value.RequestBody.Content
-                    .Where(contentType => ContentType.FromString(contentType.Key) == ContentType.Json))
+                    .Where(contentType => ContentType.From(contentType.Key) == ContentType.Json))
                 {
                     var requestBody = new RequestBody
                     {
                         Name = contentType.Value.Schema.Reference != null ? contentType.Value.Schema.Reference.Id : null,
-                        ContentType = ContentType.FromString(contentType.Key),
+                        ContentType = ContentType.ToEnum(contentType.Key),
                         Properties = null,
                         Required = openApiOperation.Value.RequestBody.Required
                     };
@@ -309,7 +309,9 @@ namespace QAToolKit.Source.Swagger
                         var temp = GetPropertiesRecursively(property);
                         if (temp != null)
                         {
-                            requestBody.Properties = new List<Property>();
+                            if (requestBody.Properties == null)
+                                requestBody.Properties = new List<Property>();
+
                             requestBody.Properties.AddRange(temp);
                         }
                     }
@@ -330,6 +332,8 @@ namespace QAToolKit.Source.Swagger
         private List<Property> GetPropertiesRecursively(KeyValuePair<string, OpenApiSchema> source)
         {
             var properties = new List<Property>();
+
+            #region Items
             Property itemsProperty = null;
 
             if (source.Value.Items != null)
@@ -361,7 +365,9 @@ namespace QAToolKit.Source.Swagger
                     }
                 }
             }
+            #endregion
 
+            #region enums
             Property enumProperty = null;
             if (source.Value.Enum != null && source.Value.Enum.Count > 0)
             {
@@ -392,6 +398,7 @@ namespace QAToolKit.Source.Swagger
                     }
                 }
             }
+            #endregion
 
             var prop = new Property
             {
@@ -487,7 +494,7 @@ namespace QAToolKit.Source.Swagger
         private ResponseType GetResponseType(OpenApiResponse value)
         {
             foreach (var contentType in value.Content.Where(contentType =>
-                  ContentType.FromString(contentType.Key) == ContentType.Json))
+                  ContentType.From(contentType.Key) == ContentType.Json))
             {
                 if (contentType.Value.Schema.Items != null &&
                     (contentType.Value.Schema.Items.Type == "array" || contentType.Value.Schema.Items.Type != "object") &&
@@ -535,7 +542,7 @@ namespace QAToolKit.Source.Swagger
 
             //TODO: support other content types
             foreach (var contentType in openApiResponse.Content.Where(contentType =>
-            ContentType.FromString(contentType.Key) == ContentType.Json))
+            ContentType.From(contentType.Key) == ContentType.Json))
             {
                 if (contentType.Value.Schema.Properties != null && contentType.Value.Schema.Properties.Count > 0)
                 {

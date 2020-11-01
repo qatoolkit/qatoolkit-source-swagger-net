@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get
 {
-    public static class PetsFindByStatusResponses
+    public static class FindPetsByTagsResponses
     {
         public static List<Response> Get(bool exampleValues)
         {

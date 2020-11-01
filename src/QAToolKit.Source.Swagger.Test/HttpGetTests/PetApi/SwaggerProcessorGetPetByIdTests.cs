@@ -12,17 +12,17 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace QAToolKit.Source.Swagger.Test.HttpGetTests
+namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
 {
-    public class SwaggerProcessorGetPetsByIdTests
+    public class SwaggerProcessorGetPetByIdTests
     {
-        private readonly ILogger<SwaggerProcessorGetPetsByIdTests> _logger;
+        private readonly ILogger<SwaggerProcessorGetPetByIdTests> _logger;
 
-        public SwaggerProcessorGetPetsByIdTests(ITestOutputHelper testOutputHelper)
+        public SwaggerProcessorGetPetByIdTests(ITestOutputHelper testOutputHelper)
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
-            _logger = loggerFactory.CreateLogger<SwaggerProcessorGetPetsByIdTests>();
+            _logger = loggerFactory.CreateLogger<SwaggerProcessorGetPetByIdTests>();
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(3, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = PetsGetByIdResponse.Get(true).ToExpectedObject();
+            var expectedPetsResponse = GetPetByIdResponse.Get(true).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
             Assert.Equal("Find pet by ID", requests.FirstOrDefault().Summary);
@@ -108,7 +108,7 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(3, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = PetsGetByIdResponse.Get(false).ToExpectedObject();
+            var expectedPetsResponse = GetPetByIdResponse.Get(false).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
             Assert.Equal("Find pet by ID", requests.FirstOrDefault().Summary);
