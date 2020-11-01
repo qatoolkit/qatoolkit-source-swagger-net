@@ -12,28 +12,28 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
+namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
 {
-    public class SwaggerProcessorGetPetByIdTests
+    public class SwaggerProcessorGetPetsByStatus
     {
-        private readonly ILogger<SwaggerProcessorGetPetByIdTests> _logger;
+        private readonly ILogger<SwaggerProcessorGetPetsByStatus> _logger;
 
-        public SwaggerProcessorGetPetByIdTests(ITestOutputHelper testOutputHelper)
+        public SwaggerProcessorGetPetsByStatus(ITestOutputHelper testOutputHelper)
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
-            _logger = loggerFactory.CreateLogger<SwaggerProcessorGetPetByIdTests>();
+            _logger = loggerFactory.CreateLogger<SwaggerProcessorGetPetsByStatus>();
         }
 
         [Fact]
-        public async Task PetsSwaggerGetPetByIdWithExampleValuesTest_Successfull()
+        public async Task PetsSwaggerGetPetsByStatuesWithExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
                 options.AddRequestFilters(new RequestFilter()
                 {
-                    EndpointNameWhitelist = new string[] { "getPetById" }
+                    EndpointNameWhitelist = new string[] { "findPetsByStatus" }
                 });
                 options.UseSwaggerExampleValues = true;
             });
@@ -48,24 +48,24 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
             Assert.Equal(1, requests.Count);
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
-            Assert.Equal("Returns a single pet", requests.FirstOrDefault().Description);
+            Assert.Equal("Multiple status values can be provided with comma separated strings", requests.FirstOrDefault().Description);
             Assert.Equal(HttpMethod.Get, requests.FirstOrDefault().Method);
-            Assert.Equal("getPetById", requests.FirstOrDefault().OperationId);
+            Assert.Equal("findPetsByStatus", requests.FirstOrDefault().OperationId);
             Assert.Single(requests.FirstOrDefault().Parameters);
-            Assert.Equal("petId", requests.FirstOrDefault().Parameters.FirstOrDefault().Name);
+            Assert.Equal("status", requests.FirstOrDefault().Parameters.FirstOrDefault().Name);
             Assert.False(requests.FirstOrDefault().Parameters.FirstOrDefault().Nullable);
-            Assert.True(requests.FirstOrDefault().Parameters.FirstOrDefault().Required);
-            Assert.Equal(Location.Path, requests.FirstOrDefault().Parameters.FirstOrDefault().Location);
-            Assert.Equal("integer", requests.FirstOrDefault().Parameters.FirstOrDefault().Type);
+            Assert.False(requests.FirstOrDefault().Parameters.FirstOrDefault().Required);
+            Assert.Equal(Location.Query, requests.FirstOrDefault().Parameters.FirstOrDefault().Location);
+            Assert.Equal("string", requests.FirstOrDefault().Parameters.FirstOrDefault().Type);
             Assert.Null(requests.FirstOrDefault().Parameters.FirstOrDefault().Value);
-            Assert.Equal("/pet/{petId}", requests.FirstOrDefault().Path);
+            Assert.Equal("/pet/findByStatus", requests.FirstOrDefault().Path);
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
-            Assert.Equal(3, requests.FirstOrDefault().Responses.Count);
+            Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = GetPetByIdResponse.Get(true).ToExpectedObject();
+            var expectedPetsResponse = FindPetsByStatusResponses.Get(true).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
-            Assert.Equal("Find pet by ID", requests.FirstOrDefault().Summary);
+            Assert.Equal("Finds Pets by status", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {
                 item = "pet";
@@ -74,14 +74,14 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
         }
 
         [Fact]
-        public async Task PetsSwaggerGetPetByIdWithoutExampleValuesTest_Successfull()
+        public async Task PetsSwaggerGetPetsByStatuesWithoutExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
                 options.AddRequestFilters(new RequestFilter()
                 {
-                    EndpointNameWhitelist = new string[] { "getPetById" }
+                    EndpointNameWhitelist = new string[] { "findPetsByStatus" }
                 });
             });
 
@@ -95,23 +95,24 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
             Assert.Equal(1, requests.Count);
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
-            Assert.Equal("Returns a single pet", requests.FirstOrDefault().Description);
+            Assert.Equal("Multiple status values can be provided with comma separated strings", requests.FirstOrDefault().Description);
             Assert.Equal(HttpMethod.Get, requests.FirstOrDefault().Method);
-            Assert.Equal("getPetById", requests.FirstOrDefault().OperationId);
+            Assert.Equal("findPetsByStatus", requests.FirstOrDefault().OperationId);
             Assert.Single(requests.FirstOrDefault().Parameters);
-            Assert.Equal("petId", requests.FirstOrDefault().Parameters.FirstOrDefault().Name);
+            Assert.Equal("status", requests.FirstOrDefault().Parameters.FirstOrDefault().Name);
             Assert.False(requests.FirstOrDefault().Parameters.FirstOrDefault().Nullable);
-            Assert.True(requests.FirstOrDefault().Parameters.FirstOrDefault().Required);
-            Assert.Equal(Location.Path, requests.FirstOrDefault().Parameters.FirstOrDefault().Location);
-            Assert.Equal("integer", requests.FirstOrDefault().Parameters.FirstOrDefault().Type);
-            Assert.Equal("/pet/{petId}", requests.FirstOrDefault().Path);
+            Assert.False(requests.FirstOrDefault().Parameters.FirstOrDefault().Required);
+            Assert.Equal(Location.Query, requests.FirstOrDefault().Parameters.FirstOrDefault().Location);
+            Assert.Equal("string", requests.FirstOrDefault().Parameters.FirstOrDefault().Type);
+            Assert.Null(requests.FirstOrDefault().Parameters.FirstOrDefault().Value);
+            Assert.Equal("/pet/findByStatus", requests.FirstOrDefault().Path);
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
-            Assert.Equal(3, requests.FirstOrDefault().Responses.Count);
+            Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = GetPetByIdResponse.Get(false).ToExpectedObject();
+            var expectedPetsResponse = FindPetsByStatusResponses.Get(false).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
-            Assert.Equal("Find pet by ID", requests.FirstOrDefault().Summary);
+            Assert.Equal("Finds Pets by status", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {
                 item = "pet";

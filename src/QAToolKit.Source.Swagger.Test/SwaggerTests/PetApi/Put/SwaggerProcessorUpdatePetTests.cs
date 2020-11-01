@@ -12,28 +12,28 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
+namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Put
 {
-    public class SwaggerProcessorAddNewPetTests
+    public class SwaggerProcessorUpdatePetTests
     {
-        private readonly ILogger<SwaggerProcessorAddNewPetTests> _logger;
+        private readonly ILogger<SwaggerProcessorUpdatePetTests> _logger;
 
-        public SwaggerProcessorAddNewPetTests(ITestOutputHelper testOutputHelper)
+        public SwaggerProcessorUpdatePetTests(ITestOutputHelper testOutputHelper)
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
-            _logger = loggerFactory.CreateLogger<SwaggerProcessorAddNewPetTests>();
+            _logger = loggerFactory.CreateLogger<SwaggerProcessorUpdatePetTests>();
         }
 
         [Fact]
-        public async Task AddNewPetWithoutExampleValuesTest_Successfull()
+        public async Task UpdatePetWithoutExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
                 options.AddRequestFilters(new RequestFilter()
                 {
-                    EndpointNameWhitelist = new string[] { "addPet" }
+                    EndpointNameWhitelist = new string[] { "updatePet" }
                 });
             });
 
@@ -45,23 +45,22 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
 
             Assert.NotNull(requests);
             Assert.Equal(1, requests.Count);
-
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
-            Assert.Equal("Add a new pet to the store", requests.FirstOrDefault().Description);
-            Assert.Equal(HttpMethod.Post, requests.FirstOrDefault().Method);
-            Assert.Equal("addPet", requests.FirstOrDefault().OperationId);
+            Assert.Equal("Update an existing pet by Id", requests.FirstOrDefault().Description);
+            Assert.Equal(HttpMethod.Put, requests.FirstOrDefault().Method);
+            Assert.Equal("updatePet", requests.FirstOrDefault().OperationId);
             Assert.Empty(requests.FirstOrDefault().Parameters);
             Assert.Equal("/pet", requests.FirstOrDefault().Path);
-            Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
+            Assert.Equal(4, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsBody = AddNewPetBody.Get(false).ToExpectedObject();
+            var expectedPetsBody = UpdatePetBody.Get(false).ToExpectedObject();
             expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies);
 
-            var expectedPetsResponse = AddNewPetResponse.Get(false).ToExpectedObject();
+            var expectedPetsResponse = UpdatePetResponse.Get(false).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
-            Assert.Equal("Add a new pet to the store", requests.FirstOrDefault().Summary);
+            Assert.Equal("Update an existing pet", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {
                 item = "pet";
@@ -70,14 +69,14 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
         }
 
         [Fact]
-        public async Task AddNewPetWithExampleValuesTest_Successfull()
+        public async Task UpdatePetWithExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
                 options.AddRequestFilters(new RequestFilter()
                 {
-                    EndpointNameWhitelist = new string[] { "addPet" }
+                    EndpointNameWhitelist = new string[] { "updatePet" }
                 });
                 options.UseSwaggerExampleValues = true;
             });
@@ -90,23 +89,22 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
 
             Assert.NotNull(requests);
             Assert.Equal(1, requests.Count);
-
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
-            Assert.Equal("Add a new pet to the store", requests.FirstOrDefault().Description);
-            Assert.Equal(HttpMethod.Post, requests.FirstOrDefault().Method);
-            Assert.Equal("addPet", requests.FirstOrDefault().OperationId);
+            Assert.Equal("Update an existing pet by Id", requests.FirstOrDefault().Description);
+            Assert.Equal(HttpMethod.Put, requests.FirstOrDefault().Method);
+            Assert.Equal("updatePet", requests.FirstOrDefault().OperationId);
             Assert.Empty(requests.FirstOrDefault().Parameters);
             Assert.Equal("/pet", requests.FirstOrDefault().Path);
-            Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
+            Assert.Equal(4, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsBody = AddNewPetBody.Get(true).ToExpectedObject();
+            var expectedPetsBody = UpdatePetBody.Get(true).ToExpectedObject();
             expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies);
 
-            var expectedPetsResponse = AddNewPetResponse.Get(true).ToExpectedObject();
+            var expectedPetsResponse = UpdatePetResponse.Get(true).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
-            Assert.Equal("Add a new pet to the store", requests.FirstOrDefault().Summary);
+            Assert.Equal("Update an existing pet", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {
                 item = "pet";

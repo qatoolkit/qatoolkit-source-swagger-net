@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace QAToolKit.Source.Swagger.Test.HttpGetTests.PetApi
+namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
 {
     public class SwaggerProcessorPetApiTests
     {
