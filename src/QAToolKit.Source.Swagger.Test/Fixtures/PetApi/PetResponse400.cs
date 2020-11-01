@@ -10,7 +10,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi
             return new Response()
             {
                 StatusCode = HttpStatusCode.BadRequest,
-                Type = ResponseType.Undefined,
+                Type = ResponseType.Empty,
                 Properties = null
             };
         }

@@ -17,16 +17,26 @@ namespace QAToolKit.Source.Swagger
     /// </summary>
     public class SwaggerProcessor
     {
+        private readonly SwaggerOptions _swaggerOptions;
+
+        /// <summary>
+        /// Create new SwaggerProcessor instance
+        /// </summary>
+        /// <param name="swaggerOptions"></param>
+        public SwaggerProcessor(SwaggerOptions swaggerOptions)
+        {
+            _swaggerOptions = swaggerOptions;
+        }
+
         /// <summary>
         /// Map Swagger documents to a list of objects
         /// </summary>
         /// <param name="baseUri"></param>
         /// <param name="openApiDocument"></param>
-        /// <param name="swaggerOptions"></param>
         /// <returns></returns>
-        public IList<HttpTestRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument, SwaggerOptions swaggerOptions)
+        public IList<HttpRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
         {
-            var restRequests = new List<HttpTestRequest>();
+            var restRequests = new List<HttpRequest>();
 
             var server = openApiDocument.Servers.FirstOrDefault();
             if (server != null)
@@ -52,34 +62,22 @@ namespace QAToolKit.Source.Swagger
                 restRequests.AddRange(GetRestRequestsForPath(baseUri, path));
             }
 
-            if (swaggerOptions.UseRequestFilter)
+            if (_swaggerOptions.UseRequestFilter)
             {
                 var filters = new SwaggerRequestFilter(restRequests);
-                restRequests = filters.FilterRequests(swaggerOptions.RequestFilter).ToList();
-            }
-
-            if (swaggerOptions.UseDataGeneration)
-            {
-                var generator = new SwaggerDataGenerator(restRequests);
-                restRequests = generator.GenerateModelValues().ToList();
-            }
-
-            if (swaggerOptions.ReplacementValues != null)
-            {
-                var generator = new SwaggerValueReplacement(restRequests, swaggerOptions.ReplacementValues);
-                restRequests = generator.ReplaceAll();
+                restRequests = filters.FilterRequests(_swaggerOptions.RequestFilter).ToList();
             }
 
             return restRequests;
         }
 
-        private IList<HttpTestRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
+        private IList<HttpRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
         {
-            var requests = new List<HttpTestRequest>();
+            var requests = new List<HttpRequest>();
 
             foreach (var operation in path.Value.Operations)
             {
-                requests.Add(new HttpTestRequest()
+                requests.Add(new HttpRequest()
                 {
                     BasePath = baseUri.ToString(),
                     Path = GetPath(path.Key),
@@ -329,7 +327,7 @@ namespace QAToolKit.Source.Swagger
         }
 
 
-        private static List<Property> GetPropertiesRecursively(KeyValuePair<string, OpenApiSchema> source)
+        private List<Property> GetPropertiesRecursively(KeyValuePair<string, OpenApiSchema> source)
         {
             var properties = new List<Property>();
             Property itemsProperty = null;
@@ -345,7 +343,9 @@ namespace QAToolKit.Source.Swagger
                     Name = source.Value.Items.Reference != null ? source.Value.Items.Reference.Id : null
                 };
                 itemsProperty.Required = source.Value.Items.Required.Contains(itemsProperty.Name);
-                itemsProperty.Value = SetValue(source.Value.Items.Example);
+
+                if (_swaggerOptions.UseSwaggerExampleValues)
+                    itemsProperty.Value = SetValue(source.Value.Items.Example);
 
                 foreach (var property in source.Value.Items.Properties)
                 {
@@ -362,7 +362,36 @@ namespace QAToolKit.Source.Swagger
                 }
             }
 
-            //TODO: add enums
+            Property enumProperty = null;
+            if (source.Value.Enum != null && source.Value.Enum.Count > 0)
+            {
+                enumProperty = new Property
+                {
+                    Description = null,
+                    Format = null,
+                    Type = "enum",
+                    Properties = new List<Property>(),
+                    Name = source.Value.Reference != null ? source.Value.Reference.Id : null,
+                };
+                enumProperty.Required = source.Value.Required.Contains(enumProperty.Name);
+
+                foreach (var enumerable in source.Value.Enum)
+                {
+                    if (enumerable != null)
+                    {
+                        enumProperty.Properties.Add(new Property()
+                        {
+                            Description = null,
+                            Format = null,
+                            Name = null,
+                            Properties = null,
+                            Required = false,
+                            Type = "string",
+                            Value = SetValue(enumerable)
+                        });
+                    }
+                }
+            }
 
             var prop = new Property
             {
@@ -370,10 +399,30 @@ namespace QAToolKit.Source.Swagger
                 Description = source.Value.Description,
                 Type = source.Value.Type,
                 Format = source.Value.Format,
-                Properties = itemsProperty == null ? null : new List<Property> { itemsProperty }
+                Properties = null
             };
+
+            if (itemsProperty != null)
+            {
+                if (prop.Properties == null)
+                    prop.Properties = new List<Property>();
+
+                prop.Properties.Add(itemsProperty);
+            }
+
+            if (enumProperty != null)
+            {
+                if (prop.Properties == null)
+                    prop.Properties = new List<Property>();
+
+                prop.Type = enumProperty.Type;
+                prop.Properties = enumProperty.Properties;
+            }
+
             prop.Required = source.Value.Required.Contains(prop.Name);
-            prop.Value = SetValue(source.Value.Example);
+
+            if (_swaggerOptions.UseSwaggerExampleValues)
+                prop.Value = SetValue(source.Value.Example);
 
             foreach (var property in source.Value.Properties)
             {
@@ -392,7 +441,7 @@ namespace QAToolKit.Source.Swagger
             return properties;
         }
 
-        private static string SetValue(IOpenApiAny value)
+        private object SetValue(IOpenApiAny value)
         {
             if (value == null)
             {
@@ -463,11 +512,11 @@ namespace QAToolKit.Source.Swagger
                 }
                 else
                 {
-                    return ResponseType.Empty;
+                    return ResponseType.Undefined;
                 }
             }
 
-            return ResponseType.Undefined;
+            return ResponseType.Empty;
         }
 
         private List<Property> GetResponseProperties(OpenApiResponse openApiResponse)

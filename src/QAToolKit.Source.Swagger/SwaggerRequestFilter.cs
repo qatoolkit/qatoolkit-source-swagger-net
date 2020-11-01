@@ -9,13 +9,13 @@ namespace QAToolKit.Source.Swagger
     /// </summary>
     public class SwaggerRequestFilter
     {
-        private readonly IList<HttpTestRequest> _requests;
+        private readonly IList<HttpRequest> _requests;
 
         /// <summary>
         /// Swagger Request filter
         /// </summary>
         /// <param name="requests"></param>
-        public SwaggerRequestFilter(IList<HttpTestRequest> requests)
+        public SwaggerRequestFilter(IList<HttpRequest> requests)
         {
             _requests = requests;
         }
@@ -24,9 +24,9 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="requestFilter"></param>
         /// <returns></returns>
-        public IList<HttpTestRequest> FilterRequests(RequestFilter requestFilter)
+        public IList<HttpRequest> FilterRequests(RequestFilter requestFilter)
         {
-            var requestsLocal = new List<HttpTestRequest>();
+            var requestsLocal = new List<HttpRequest>();
 
             if (requestFilter.AuthenticationTypes != null)
             {

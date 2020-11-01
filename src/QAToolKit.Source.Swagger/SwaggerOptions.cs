@@ -15,10 +15,6 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal RequestFilter RequestFilter { get; private set; }
         /// <summary>
-        /// Key/value pairs of replacement values
-        /// </summary>
-        internal ReplacementValue[] ReplacementValues { get; private set; }
-        /// <summary>
         /// Is Swagger protected with Basic authentication?
         /// </summary>
         internal bool UseBasicAuth { get; private set; } = false;
@@ -39,9 +35,9 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal Uri BaseUrl { get; private set; }
         /// <summary>
-        /// Should data be automatically generated
+        /// Use Swagger example values that come with Swagger file
         /// </summary>
-        internal bool UseDataGeneration { get; private set; } = false;
+        internal bool UseSwaggerExampleValues { get; set; } = false;
 
         /// <summary>
         /// Add basic authentication
@@ -70,17 +66,6 @@ namespace QAToolKit.Source.Swagger
         }
 
         /// <summary>
-        /// Use replacement values
-        /// </summary>
-        /// <param name="replacementValues"></param>
-        /// <returns></returns>
-        public SwaggerOptions AddReplacementValues(ReplacementValue[] replacementValues)
-        {
-            ReplacementValues = replacementValues;
-            return this;
-        }
-
-        /// <summary>
         /// Add base url
         /// </summary>
         /// <param name="baseUrl"></param>
@@ -88,16 +73,6 @@ namespace QAToolKit.Source.Swagger
         public SwaggerOptions AddBaseUrl(Uri baseUrl)
         {
             BaseUrl = baseUrl;
-            return this;
-        }
-
-        /// <summary>
-        /// Add data generation to the Swagger processor
-        /// </summary>
-        /// <returns></returns>
-        public SwaggerOptions AddDataGeneration()
-        {
-            UseDataGeneration = true;
             return this;
         }
     }

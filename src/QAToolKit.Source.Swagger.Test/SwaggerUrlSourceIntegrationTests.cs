@@ -41,13 +41,6 @@ namespace QAToolKit.Source.Swagger.Test
                   {
                       EndpointNameWhitelist = new string[] { "getPetById", "addPet" }
                   });
-                  options.AddReplacementValues(new ReplacementValue[] {
-              new ReplacementValue()
-                  {
-                      Key = "petId",
-                      Value = "1"
-                  }
-                  });
               });
 
             var requests = await swaggerSource.Load(new Uri[] {

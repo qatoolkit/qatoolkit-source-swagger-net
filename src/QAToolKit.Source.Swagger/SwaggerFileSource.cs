@@ -12,7 +12,7 @@ namespace QAToolKit.Source.Swagger
     /// <summary>
     /// Swagger file source
     /// </summary>
-    public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpTestRequest>>
+    public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpRequest>>
     {
         private readonly SwaggerOptions _swaggerOptions;
 
@@ -31,12 +31,12 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<IList<HttpTestRequest>> Load(IList<FileInfo> source)
+        public async Task<IList<HttpRequest>> Load(IList<FileInfo> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var restRequests = new List<HttpTestRequest>();
-            var processor = new SwaggerProcessor();
+            var restRequests = new List<HttpRequest>();
+            var processor = new SwaggerProcessor(_swaggerOptions);
 
             foreach (var filePath in source)
             {
@@ -47,7 +47,7 @@ namespace QAToolKit.Source.Swagger
                     var textWritter = new OpenApiJsonWriter(new StringWriter());
                     openApiDocument.SerializeAsV3(textWritter);
 
-                    var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument, _swaggerOptions);
+                    var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument);
 
                     restRequests.AddRange(requests);
                 }

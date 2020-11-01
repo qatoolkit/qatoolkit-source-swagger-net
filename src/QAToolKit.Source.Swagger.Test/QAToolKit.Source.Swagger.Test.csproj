@@ -32,4 +32,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Fixtures\PetApi\Delete\" />
+    <Folder Include="Fixtures\PetApi\Put\" />
+    <Folder Include="Fixtures\PetApi\Post\" />
+  </ItemGroup>
+
 </Project>

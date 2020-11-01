@@ -1,9 +1,9 @@
 ﻿using QAToolKit.Core.Models;
 using System.Collections.Generic;
 
-namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi
+namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get.Helpers
 {
-    public static class PetObjectResponse
+    public static class PetObjectWithExampleValues
     {
         public static List<Property> GetProperties()
         {
@@ -124,8 +124,39 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi
                             Description = "pet status in the store",
                             Format = null,
                             Required = false,
-                            Properties = null,
-                            Type = "string",
+                            Properties = new List<Property>(){
+                                        new Property()
+                                        {
+                                            Name = null,
+                                            Description = null,
+                                            Format = null,
+                                            Required = false,
+                                            Properties = null,
+                                            Type = "string",
+                                            Value = "available"
+                                        },
+                                        new Property()
+                                        {
+                                            Name = null,
+                                            Description = null,
+                                            Format = null,
+                                            Required = false,
+                                            Properties = null,
+                                            Type = "string",
+                                            Value = "pending"
+                                        },
+                                        new Property()
+                                        {
+                                            Name = null,
+                                            Description = null,
+                                            Format = null,
+                                            Required = false,
+                                            Properties = null,
+                                            Type = "string",
+                                            Value = "sold"
+                                        }
+                                    },
+                            Type = "enum",
                             Value = null
                         }
                     };

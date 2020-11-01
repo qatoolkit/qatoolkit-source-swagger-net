@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using QAToolKit.Core.Models;
-using QAToolKit.Source.Swagger.Test.Fixtures.PetApi;
+using QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +26,7 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
         }
 
         [Fact]
-        public async Task PetsSwaggerGetByPetByIdV3Test_Successfull()
+        public async Task PetsSwaggerGetPetByIdWithExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
@@ -35,6 +35,7 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
                 {
                     EndpointNameWhitelist = new string[] { "getPetById" }
                 });
+                options.UseSwaggerExampleValues = true;
             });
 
             var requests = await fileSource.Load(new List<FileInfo>() {
@@ -61,7 +62,7 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(3, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = PetsGetByIdResponseFixtures.Get().ToExpectedObject();
+            var expectedPetsResponse = PetsGetByIdResponse.Get(true).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
             Assert.Equal("Find pet by ID", requests.FirstOrDefault().Summary);
@@ -73,7 +74,7 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
         }
 
         [Fact]
-        public async Task PetsSwaggerGetByPetByIdWithReplacableIdV3Test_Successfull()
+        public async Task PetsSwaggerGetPetByIdWithoutExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
@@ -81,10 +82,6 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
                 options.AddRequestFilters(new RequestFilter()
                 {
                     EndpointNameWhitelist = new string[] { "getPetById" }
-                });
-                options.AddReplacementValues(new ReplacementValue[]
-                {
-                    new ReplacementValue() { Key = "petId", Value = "999" }
                 });
             });
 
@@ -107,12 +104,11 @@ namespace QAToolKit.Source.Swagger.Test.HttpGetTests
             Assert.True(requests.FirstOrDefault().Parameters.FirstOrDefault().Required);
             Assert.Equal(Location.Path, requests.FirstOrDefault().Parameters.FirstOrDefault().Location);
             Assert.Equal("integer", requests.FirstOrDefault().Parameters.FirstOrDefault().Type);
-            Assert.Equal("999", requests.FirstOrDefault().Parameters.FirstOrDefault().Value);
-            Assert.Equal("/pet/999", requests.FirstOrDefault().Path);
+            Assert.Equal("/pet/{petId}", requests.FirstOrDefault().Path);
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(3, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = PetsGetByIdResponseFixtures.Get().ToExpectedObject();
+            var expectedPetsResponse = PetsGetByIdResponse.Get(false).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
             Assert.Equal("Find pet by ID", requests.FirstOrDefault().Summary);
