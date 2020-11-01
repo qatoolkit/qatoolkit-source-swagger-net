@@ -12,28 +12,28 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Delete
+namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
 {
-    public class SwaggerProcessorDeletePetTests
+    public class SwaggerProcessorUploadPetImageTests
     {
-        private readonly ILogger<SwaggerProcessorDeletePetTests> _logger;
+        private readonly ILogger<SwaggerProcessorUploadPetImageTests> _logger;
 
-        public SwaggerProcessorDeletePetTests(ITestOutputHelper testOutputHelper)
+        public SwaggerProcessorUploadPetImageTests(ITestOutputHelper testOutputHelper)
         {
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
-            _logger = loggerFactory.CreateLogger<SwaggerProcessorDeletePetTests>();
+            _logger = loggerFactory.CreateLogger<SwaggerProcessorUploadPetImageTests>();
         }
 
         [Fact]
-        public async Task DeletePetWithoutExampleValuesTest_Successfull()
+        public async Task UploadPetImageWithoutExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
                 options.AddRequestFilters(new RequestFilter()
                 {
-                    EndpointNameWhitelist = new string[] { "deletePet" }
+                    EndpointNameWhitelist = new string[] { "uploadFile" }
                 });
             });
 
@@ -45,23 +45,27 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Delete
 
             Assert.NotNull(requests);
             Assert.Equal(1, requests.Count);
+
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
             Assert.Equal("", requests.FirstOrDefault().Description);
-            Assert.Equal(HttpMethod.Delete, requests.FirstOrDefault().Method);
-            Assert.Equal("deletePet", requests.FirstOrDefault().OperationId);
+            Assert.Equal(HttpMethod.Post, requests.FirstOrDefault().Method);
+            Assert.Equal("uploadFile", requests.FirstOrDefault().OperationId);
+            Assert.Equal("/pet/{petId}/uploadImage", requests.FirstOrDefault().Path);
+            Assert.Single(requests.FirstOrDefault().Responses);
             Assert.Equal(2, requests.FirstOrDefault().Parameters.Count);
 
-            var expectedPetDeleteResponse = DeletePetParameters.Get(false).ToExpectedObject();
-            expectedPetDeleteResponse.ShouldEqual(requests.FirstOrDefault().Parameters);
+            var expectedUploadPetImageParameters = UploadPetImageParameters.Get(true).ToExpectedObject();
+            expectedUploadPetImageParameters.ShouldEqual(requests.FirstOrDefault().Parameters);
 
-            Assert.Equal("/pet/{petId}", requests.FirstOrDefault().Path);
-            Assert.Single(requests.FirstOrDefault().Responses);
+            var expectedUploadPetImageBody = UploadPetImageBody.Get().ToExpectedObject();
+            expectedUploadPetImageBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
+                .Where(c => c.ContentType == ContentType.Enumeration.OctetStream).ToList());
 
-            var expectedPetsResponse = DeletePetResponse.Get().ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            var expectedUploadPetImageResponse = UploadPetImageResponse.Get().ToExpectedObject();
+            expectedUploadPetImageResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
-            Assert.Equal("Deletes a pet", requests.FirstOrDefault().Summary);
+            Assert.Equal("uploads an image", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {
                 item = "pet";
@@ -70,14 +74,14 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Delete
         }
 
         [Fact]
-        public async Task DeletePetWithExampleValuesTest_Successfull()
+        public async Task UploadPetImageWithExampleValuesTest_Successfull()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
                 options.AddRequestFilters(new RequestFilter()
                 {
-                    EndpointNameWhitelist = new string[] { "deletePet" }
+                    EndpointNameWhitelist = new string[] { "uploadFile" }
                 });
                 options.UseSwaggerExampleValues = true;
             });
@@ -90,23 +94,27 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Delete
 
             Assert.NotNull(requests);
             Assert.Equal(1, requests.Count);
+
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
             Assert.Equal("", requests.FirstOrDefault().Description);
-            Assert.Equal(HttpMethod.Delete, requests.FirstOrDefault().Method);
-            Assert.Equal("deletePet", requests.FirstOrDefault().OperationId);
+            Assert.Equal(HttpMethod.Post, requests.FirstOrDefault().Method);
+            Assert.Equal("uploadFile", requests.FirstOrDefault().OperationId);
+            Assert.Equal("/pet/{petId}/uploadImage", requests.FirstOrDefault().Path);
+            Assert.Single(requests.FirstOrDefault().Responses);
             Assert.Equal(2, requests.FirstOrDefault().Parameters.Count);
 
-            var expectedPetDeleteResponse = DeletePetParameters.Get(true).ToExpectedObject();
-            expectedPetDeleteResponse.ShouldEqual(requests.FirstOrDefault().Parameters);
+            var expectedUploadPetImageParameters = UploadPetImageParameters.Get(true).ToExpectedObject();
+            expectedUploadPetImageParameters.ShouldEqual(requests.FirstOrDefault().Parameters);
 
-            Assert.Equal("/pet/{petId}", requests.FirstOrDefault().Path);
-            Assert.Single(requests.FirstOrDefault().Responses);
+            var expectedUploadPetImageBody = UploadPetImageBody.Get().ToExpectedObject();
+            expectedUploadPetImageBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
+                .Where(c => c.ContentType == ContentType.Enumeration.OctetStream).ToList());
 
-            var expectedPetsResponse = DeletePetResponse.Get().ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            var expectedUploadPetImageResponse = UploadPetImageResponse.Get().ToExpectedObject();
+            expectedUploadPetImageResponse.ShouldEqual(requests.FirstOrDefault().Responses);
 
-            Assert.Equal("Deletes a pet", requests.FirstOrDefault().Summary);
+            Assert.Equal("uploads an image", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {
                 item = "pet";

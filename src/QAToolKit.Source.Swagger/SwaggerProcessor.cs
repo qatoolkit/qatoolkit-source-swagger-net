@@ -293,8 +293,7 @@ namespace QAToolKit.Source.Swagger
                 }
 
                 //TODO: support other content types
-                foreach (var contentType in openApiOperation.Value.RequestBody.Content
-                    .Where(contentType => ContentType.From(contentType.Key) == ContentType.Json))
+                foreach (var contentType in openApiOperation.Value.RequestBody.Content)
                 {
                     var requestBody = new RequestBody
                     {

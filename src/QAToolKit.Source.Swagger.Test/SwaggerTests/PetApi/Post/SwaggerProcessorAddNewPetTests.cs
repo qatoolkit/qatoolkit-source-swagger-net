@@ -56,7 +56,8 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
             var expectedPetsBody = AddNewPetBody.Get(false).ToExpectedObject();
-            expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies);
+            expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
+                .Where(c => c.ContentType == ContentType.Enumeration.Json).ToList());
 
             var expectedPetsResponse = AddNewPetResponse.Get(false).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
@@ -101,7 +102,8 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
             var expectedPetsBody = AddNewPetBody.Get(true).ToExpectedObject();
-            expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies);
+            expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
+                .Where(c => c.ContentType == ContentType.Enumeration.Json).ToList());
 
             var expectedPetsResponse = AddNewPetResponse.Get(true).ToExpectedObject();
             expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
