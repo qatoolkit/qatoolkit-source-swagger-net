@@ -202,12 +202,18 @@ namespace QAToolKit.Source.Swagger
             {
                 case "200":
                     return HttpStatusCode.OK;
+                case "201":
+                    return HttpStatusCode.Created;
                 case "202":
                     return HttpStatusCode.Accepted;
                 case "204":
                     return HttpStatusCode.NoContent;
                 case "400":
                     return HttpStatusCode.BadRequest;
+                case "401":
+                    return HttpStatusCode.Unauthorized;
+                case "403":
+                    return HttpStatusCode.Forbidden;
                 case "404":
                     return HttpStatusCode.NotFound;
                 case "405":
@@ -239,14 +245,21 @@ namespace QAToolKit.Source.Swagger
 
             foreach (var parameter in openApiOperation.Value.Parameters)
             {
-                parameters.Add(new Parameter()
+                var param = new Parameter()
                 {
                     Name = parameter.Name,
                     Type = parameter.Schema.Type,
                     Nullable = parameter.Schema.Nullable,
                     Required = parameter.Required,
                     Location = GetPlacement(parameter.In.Value)
-                });
+                };
+
+                if (_swaggerOptions.UseSwaggerExampleValues &&
+                    parameter.Example != null)
+                    param.Value = SetValue(parameter.Example).ToString();
+
+
+                parameters.Add(param);
             }
 
             return parameters;

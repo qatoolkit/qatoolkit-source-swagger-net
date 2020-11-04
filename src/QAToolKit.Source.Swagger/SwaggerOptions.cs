@@ -37,7 +37,7 @@ namespace QAToolKit.Source.Swagger
         /// <summary>
         /// Use Swagger example values that come with Swagger file
         /// </summary>
-        internal bool UseSwaggerExampleValues { get; set; } = false;
+        public bool UseSwaggerExampleValues { get; set; } = false;
 
         /// <summary>
         /// Add basic authentication

@@ -65,11 +65,6 @@ namespace QAToolKit.Source.Swagger
                 }
             }
 
-            File.WriteAllText("d:\\ddddd.json", JsonConvert.SerializeObject(restRequests, new JsonSerializerSettings()
-            {
-                Formatting = Formatting.Indented
-            }));
-
             return restRequests;
         }
     }
