@@ -44,7 +44,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.BicycleApi.Get
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(1, requests.Count);
+            Assert.Single(requests);
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://qatoolkitapi.azurewebsites.net/", requests.FirstOrDefault().BasePath);
             Assert.Equal("Get all bikes", requests.FirstOrDefault().Description);

@@ -45,7 +45,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(1, requests.Count);
+            Assert.Single(requests);
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
             Assert.Equal("Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.", requests.FirstOrDefault().Description);
@@ -93,7 +93,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(1, requests.Count);
+            Assert.Single(requests);
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
             Assert.Equal("Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.", requests.FirstOrDefault().Description);

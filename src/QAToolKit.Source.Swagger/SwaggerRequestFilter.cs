@@ -10,13 +10,13 @@ namespace QAToolKit.Source.Swagger
     /// </summary>
     public class SwaggerRequestFilter
     {
-        private readonly IList<HttpRequest> _requests;
+        private readonly IEnumerable<HttpRequest> _requests;
 
         /// <summary>
         /// Swagger Request filter
         /// </summary>
         /// <param name="requests"></param>
-        public SwaggerRequestFilter(IList<HttpRequest> requests)
+        public SwaggerRequestFilter(IEnumerable<HttpRequest> requests)
         {
             _requests = requests ?? throw new ArgumentNullException(nameof(requests));
         }
@@ -25,7 +25,7 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="requestFilter"></param>
         /// <returns></returns>
-        public IList<HttpRequest> FilterRequests(RequestFilter requestFilter)
+        public IEnumerable<HttpRequest> FilterRequests(RequestFilter requestFilter)
         {
             var requestsLocal = new List<HttpRequest>();
 

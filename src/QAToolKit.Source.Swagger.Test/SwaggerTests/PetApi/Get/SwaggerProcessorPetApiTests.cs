@@ -4,6 +4,7 @@ using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -36,7 +37,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(19, requests.Count);
+            Assert.Equal(19, requests.Count());
         }
 
         [Fact]
@@ -58,7 +59,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(4, requests.Count);
+            Assert.Equal(4, requests.Count());
         }
     }
 }

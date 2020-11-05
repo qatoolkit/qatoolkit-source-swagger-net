@@ -35,7 +35,7 @@ namespace QAToolKit.Source.Swagger
         /// <param name="baseUri"></param>
         /// <param name="openApiDocument"></param>
         /// <returns></returns>
-        public IList<HttpRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
+        public IEnumerable<HttpRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
         {
             var restRequests = new List<HttpRequest>();
 
@@ -72,7 +72,7 @@ namespace QAToolKit.Source.Swagger
             return restRequests;
         }
 
-        private IList<HttpRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
+        private IEnumerable<HttpRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
         {
             var requests = new List<HttpRequest>();
 
@@ -186,14 +186,18 @@ namespace QAToolKit.Source.Swagger
                     return HttpMethod.Head;
                 case "trace":
                     return HttpMethod.Trace;
-                case "patch":
 #if NETSTANDARD2_0
+                case "patch":
                     return new HttpMethod("Patch");
 #elif NETSTANDARD2_1
+                case "patch":
+                    return HttpMethod.Patch;
+#elif NETCOREAPP3_1
+                case "patch":
                     return HttpMethod.Patch;
 #endif
                 default:
-                    throw new QAToolKitSwaggerException("HttpMethod invalid.");
+                    throw new QAToolKitSwaggerException($"HttpMethod invalid '{httpMethodString}'.");
             }
         }
 
@@ -213,7 +217,7 @@ namespace QAToolKit.Source.Swagger
                 "409" => HttpStatusCode.Conflict,
                 "500" => HttpStatusCode.InternalServerError,
                 "default" => null,
-                _ => throw new QAToolKitSwaggerException("HttpStatusCode not found."),
+                _ => throw new QAToolKitSwaggerException($"HttpStatusCode not found '{statusCode}'."),
             };
         }
 
@@ -227,7 +231,7 @@ namespace QAToolKit.Source.Swagger
             return openApiOperation.Value.OperationId;
         }
 
-        private IList<Parameter> GetParameters(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
+        private IEnumerable<Parameter> GetParameters(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
         {
             var parameters = new List<Parameter>();
 
@@ -255,25 +259,18 @@ namespace QAToolKit.Source.Swagger
 
         private Location GetPlacement(ParameterLocation In)
         {
-            if (In == ParameterLocation.Query)
+            switch (In)
             {
-                return Location.Query;
-            }
-            else if (In == ParameterLocation.Path)
-            {
-                return Location.Path;
-            }
-            else if (In == ParameterLocation.Header)
-            {
-                return Location.Header;
-            }
-            else if (In == ParameterLocation.Cookie)
-            {
-                return Location.Cookie;
-            }
-            else
-            {
-                return Location.Undefined;
+                case ParameterLocation.Query:
+                    return Location.Query;
+                case ParameterLocation.Path:
+                    return Location.Path;
+                case ParameterLocation.Header:
+                    return Location.Header;
+                case ParameterLocation.Cookie:
+                    return Location.Cookie;
+                default:
+                    throw new QAToolKitSwaggerException($"Invalid parameter location '{In}'.");
             }
         }
 

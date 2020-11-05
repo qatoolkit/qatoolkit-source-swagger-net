@@ -1,11 +1,11 @@
 # QAToolKit.Source.Swagger
 ![.NET Core](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
 
-`QAToolKit.Source.Swagger` is a .NET standard library, which generates `IList<HttpRequest>` object that is the input for other components.
+`QAToolKit.Source.Swagger` is a .NET standard library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
 
 Major features:
 
-- Parses `OpenAPI v3.0` Swagger files,
+- Parses `OpenAPI v3.0` Swagger files (JSON or YAML),
 - swagger.json can be loaded from `disk` or from `URL`,
 - access swagger.json from URL, which is protected by `basic authentication`,
 - control which swagger endpoints are returned by specifying `request filters` (check below)
@@ -31,7 +31,7 @@ SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
     });
 
 //To run the Swagger parser we need to pass an array of URLs
-IList<HttpRequest> requests = await swaggerSource.Load(new Uri[] {
+IEnumerable<HttpRequest> requests = await swaggerSource.Load(new Uri[] {
     new Uri("https://api.demo.com/swagger/v1/swagger.json"),
     new Uri("https://api2.demo.com/swagger/v1/swagger.json")
 });

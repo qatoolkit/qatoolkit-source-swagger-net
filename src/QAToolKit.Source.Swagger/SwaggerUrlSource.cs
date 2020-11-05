@@ -15,7 +15,7 @@ namespace QAToolKit.Source.Swagger
     /// <summary>
     /// Swagger Url source
     /// </summary>
-    public class SwaggerUrlSource : ITestSource<Uri[], IList<HttpRequest>>
+    public class SwaggerUrlSource : ITestSource<Uri[], IEnumerable<HttpRequest>>
     {
         private readonly SwaggerOptions _swaggerOptions;
 
@@ -34,7 +34,7 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<IList<HttpRequest>> Load(Uri[] source)
+        public async Task<IEnumerable<HttpRequest>> Load(Uri[] source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 

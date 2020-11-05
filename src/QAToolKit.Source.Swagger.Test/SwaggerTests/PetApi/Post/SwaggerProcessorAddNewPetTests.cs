@@ -44,7 +44,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(1, requests.Count);
+            Assert.Single(requests);
 
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);
@@ -90,7 +90,7 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
-            Assert.Equal(1, requests.Count);
+            Assert.Single(requests);
 
             Assert.Empty(requests.FirstOrDefault().AuthenticationTypes);
             Assert.Equal("https://petstore3.swagger.io/api/v3", requests.FirstOrDefault().BasePath);

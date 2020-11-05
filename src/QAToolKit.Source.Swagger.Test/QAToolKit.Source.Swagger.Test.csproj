@@ -27,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\support-tickets.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\swagger-pets-test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

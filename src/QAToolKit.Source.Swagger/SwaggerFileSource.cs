@@ -5,6 +5,7 @@ using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace QAToolKit.Source.Swagger
@@ -12,7 +13,7 @@ namespace QAToolKit.Source.Swagger
     /// <summary>
     /// Swagger file source
     /// </summary>
-    public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpRequest>>
+    public class SwaggerFileSource : ITestSource<IEnumerable<FileInfo>, IEnumerable<HttpRequest>>
     {
         private readonly SwaggerOptions _swaggerOptions;
 
@@ -31,7 +32,7 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<IList<HttpRequest>> Load(IList<FileInfo> source)
+        public Task<IEnumerable<HttpRequest>> Load(IEnumerable<FileInfo> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
@@ -53,7 +54,7 @@ namespace QAToolKit.Source.Swagger
                 }
             }
 
-            return restRequests;
+            return Task.FromResult(restRequests.AsEnumerable());
         }
     }
 }
