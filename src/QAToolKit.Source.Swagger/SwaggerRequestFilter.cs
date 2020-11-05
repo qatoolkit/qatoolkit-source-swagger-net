@@ -1,4 +1,5 @@
 ﻿using QAToolKit.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,7 +18,7 @@ namespace QAToolKit.Source.Swagger
         /// <param name="requests"></param>
         public SwaggerRequestFilter(IList<HttpRequest> requests)
         {
-            _requests = requests;
+            _requests = requests ?? throw new ArgumentNullException(nameof(requests));
         }
         /// <summary>
         /// Filter out the requests by the specified filters

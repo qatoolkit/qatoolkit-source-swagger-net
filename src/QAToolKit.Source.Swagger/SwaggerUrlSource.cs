@@ -1,6 +1,5 @@
 ﻿using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Writers;
-using Newtonsoft.Json;
 using QAToolKit.Core.Interfaces;
 using QAToolKit.Core.Models;
 using System;

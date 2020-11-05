@@ -47,6 +47,11 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddBasicAuthentication(string userName, string password)
         {
+            if (string.IsNullOrEmpty(userName))
+                throw new ArgumentException(nameof(userName));
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentException(nameof(password));
+
             UseBasicAuth = true;
             UserName = userName;
             Password = password;
@@ -60,6 +65,9 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddRequestFilters(RequestFilter requestFilter)
         {
+            if (requestFilter == null)
+                throw new ArgumentException(nameof(requestFilter));
+
             UseRequestFilter = true;
             RequestFilter = requestFilter;
             return this;
@@ -72,6 +80,9 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddBaseUrl(Uri baseUrl)
         {
+            if (baseUrl == null)
+                throw new ArgumentException(nameof(baseUrl));
+
             BaseUrl = baseUrl;
             return this;
         }

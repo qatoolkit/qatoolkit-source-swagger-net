@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Writers;
 using QAToolKit.Core.Models;
+using QAToolKit.Source.Swagger.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -50,7 +51,7 @@ namespace QAToolKit.Source.Swagger
                 {
                     if (baseUri == null)
                     {
-                        throw new Exception("Swagger from file source needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
+                        throw new QAToolKitSwaggerException("Swagger from file source needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
                     }
 
                     baseUri = new Uri(baseUri, tempUri);
@@ -192,7 +193,7 @@ namespace QAToolKit.Source.Swagger
                     return HttpMethod.Patch;
 #endif
                 default:
-                    throw new Exception("HttpMethod invalid.");
+                    throw new QAToolKitSwaggerException("HttpMethod invalid.");
             }
         }
 
@@ -225,7 +226,7 @@ namespace QAToolKit.Source.Swagger
                 case "default":
                     return null;
                 default:
-                    throw new Exception("HttpStatusCode not found.");
+                    throw new QAToolKitSwaggerException("HttpStatusCode not found.");
             }
         }
 

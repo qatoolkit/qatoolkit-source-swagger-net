@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using QAToolKit.Source.Swagger.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,7 +41,7 @@ namespace QAToolKit.Source.Swagger.Test
         {
             var fileSource = new SwaggerFileSource();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => await fileSource.Load(new List<FileInfo>() {
+            var exception = await Assert.ThrowsAsync<QAToolKitSwaggerException>(async () => await fileSource.Load(new List<FileInfo>() {
                 new FileInfo("Assets/swagger-pets-test.json")
             }));
 
