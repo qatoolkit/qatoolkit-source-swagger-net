@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using QAToolKit.Core.Models;
 using System;
 using System.Threading.Tasks;
@@ -46,6 +47,8 @@ namespace QAToolKit.Source.Swagger.Test
             var requests = await swaggerSource.Load(new Uri[] {
                    new Uri("https://petstore3.swagger.io/api/v3/openapi.json")
               });
+
+            _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
 
             Assert.NotNull(requests);
         }
