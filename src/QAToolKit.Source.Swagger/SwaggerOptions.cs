@@ -15,10 +15,6 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal RequestFilter RequestFilter { get; private set; }
         /// <summary>
-        /// Key/value pairs of replacement values
-        /// </summary>
-        internal ReplacementValue[] ReplacementValues { get; private set; }
-        /// <summary>
         /// Is Swagger protected with Basic authentication?
         /// </summary>
         internal bool UseBasicAuth { get; private set; } = false;
@@ -39,9 +35,9 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal Uri BaseUrl { get; private set; }
         /// <summary>
-        /// Should data be automatically generated
+        /// Use Swagger example values that come with Swagger file
         /// </summary>
-        internal bool UseDataGeneration { get; private set; } = false;
+        public bool UseSwaggerExampleValues { get; set; } = false;
 
         /// <summary>
         /// Add basic authentication
@@ -51,6 +47,11 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddBasicAuthentication(string userName, string password)
         {
+            if (string.IsNullOrEmpty(userName))
+                throw new ArgumentException(nameof(userName));
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentException(nameof(password));
+
             UseBasicAuth = true;
             UserName = userName;
             Password = password;
@@ -65,18 +66,7 @@ namespace QAToolKit.Source.Swagger
         public SwaggerOptions AddRequestFilters(RequestFilter requestFilter)
         {
             UseRequestFilter = true;
-            RequestFilter = requestFilter;
-            return this;
-        }
-
-        /// <summary>
-        /// Use replacement values
-        /// </summary>
-        /// <param name="replacementValues"></param>
-        /// <returns></returns>
-        public SwaggerOptions AddReplacementValues(ReplacementValue[] replacementValues)
-        {
-            ReplacementValues = replacementValues;
+            RequestFilter = requestFilter ?? throw new ArgumentException(nameof(requestFilter));
             return this;
         }
 
@@ -87,17 +77,7 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddBaseUrl(Uri baseUrl)
         {
-            BaseUrl = baseUrl;
-            return this;
-        }
-
-        /// <summary>
-        /// Add data generation to the Swagger processor
-        /// </summary>
-        /// <returns></returns>
-        public SwaggerOptions AddDataGeneration()
-        {
-            UseDataGeneration = true;
+            BaseUrl = baseUrl ?? throw new ArgumentException(nameof(baseUrl));
             return this;
         }
     }

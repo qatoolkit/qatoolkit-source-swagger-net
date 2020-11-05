@@ -1,13 +1,24 @@
-﻿using QAToolKit.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace QAToolKit.Source.Swagger.Test
 {
     public class SwaggerOptionsTest
     {
+        private readonly ILogger<SwaggerOptionsTest> _logger;
+
+        public SwaggerOptionsTest(ITestOutputHelper testOutputHelper)
+        {
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new XunitLoggerProvider(testOutputHelper));
+            _logger = loggerFactory.CreateLogger<SwaggerOptionsTest>();
+        }
+
         [Fact]
         public void SwaggerBasicAuthTest_Successful()
         {
@@ -19,27 +30,6 @@ namespace QAToolKit.Source.Swagger.Test
             Assert.True(options.UseBasicAuth);
         }
 
-        [Fact]
-        public void SwaggerAddReplacementValuesTest_Successful()
-        {
-            var options = new SwaggerOptions();
-            options.AddReplacementValues(new ReplacementValue[] {
-                new ReplacementValue() {
-                    Key = "userId",
-                    Value = "1"
-                },
-                new ReplacementValue() {
-                    Key = "roleId",
-                    Value = "100"
-                }
-            });
-
-            Assert.Equal(2, options.ReplacementValues.Count());
-            Assert.Equal("userId", options.ReplacementValues[0].Key);
-            Assert.Equal("1", options.ReplacementValues[0].Value);
-            Assert.Equal("roleId", options.ReplacementValues[1].Key);
-            Assert.Equal("100", options.ReplacementValues[1].Value);
-        }
 
         [Fact]
         public void SwaggerAuthenticationTypeRequestFiltersTest_Successful()
@@ -101,23 +91,6 @@ namespace QAToolKit.Source.Swagger.Test
             var options = new SwaggerOptions();
 
             Assert.Null(options.BaseUrl);
-        }
-
-        [Fact]
-        public void SwaggerAddDataGenerationOnRequestFiltersTest_Successful()
-        {
-            var options = new SwaggerOptions();
-            options.AddDataGeneration();
-
-            Assert.True(options.UseDataGeneration);
-        }
-
-        [Fact]
-        public void SwaggerAddDataGenerationOffRequestFiltersTest_Successful()
-        {
-            var options = new SwaggerOptions();
-
-            Assert.False(options.UseDataGeneration);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace QAToolKit.Source.Swagger
     /// <summary>
     /// Swagger Url source
     /// </summary>
-    public class SwaggerUrlSource : ITestSource<Uri[], IList<HttpTestRequest>>
+    public class SwaggerUrlSource : ITestSource<Uri[], IEnumerable<HttpRequest>>
     {
         private readonly SwaggerOptions _swaggerOptions;
 
@@ -34,12 +34,12 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<IList<HttpTestRequest>> Load(Uri[] source)
+        public async Task<IEnumerable<HttpRequest>> Load(Uri[] source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var restRequests = new List<HttpTestRequest>();
-            var processor = new SwaggerProcessor();
+            var restRequests = new List<HttpRequest>();
+            var processor = new SwaggerProcessor(_swaggerOptions);
 
             foreach (var uri in source)
             {
@@ -59,24 +59,6 @@ namespace QAToolKit.Source.Swagger
                     openApiDocument.SerializeAsV3(textWritter);
 
                     var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
-
-                    if (_swaggerOptions.UseRequestFilter)
-                    {
-                        var filters = new SwaggerRequestFilter(requests);
-                        requests = filters.FilterRequests(_swaggerOptions.RequestFilter);
-                    }
-
-                    if (_swaggerOptions.UseDataGeneration)
-                    {
-                        var generator = new SwaggerDataGenerator(requests);
-                        requests = generator.GenerateModelValues();
-                    }
-
-                    if (_swaggerOptions.ReplacementValues != null)
-                    {
-                        var generator = new SwaggerValueReplacement(requests, _swaggerOptions.ReplacementValues);
-                        requests = generator.ReplaceAll();
-                    }
 
                     restRequests.AddRange(requests);
                 }

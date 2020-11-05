@@ -1,15 +1,14 @@
 # QAToolKit.Source.Swagger
 ![.NET Core](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
 
-`QAToolKit.Source.Swagger` is a .NET standard library, which generates `IList<HttpTestRequest>` object that is the input for other components.
+`QAToolKit.Source.Swagger` is a .NET standard library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
 
 Major features:
 
-- Parses `OpenAPI v3.0` Swagger files,
+- Parses `OpenAPI v3.0` Swagger files (JSON or YAML),
 - swagger.json can be loaded from `disk` or from `URL`,
-- path parameters, URL paramters and JSON body models are replaced with custom values,
 - access swagger.json from URL, which is protected by `basic authentication`,
-- control which swagger endpoints are called by specifying `request filters` (check below)
+- control which swagger endpoints are returned by specifying `request filters` (check below)
 
 ## Sample
 
@@ -20,17 +19,6 @@ This is a sample of instantiating a new Swagger Source object from URL.
 SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
     options =>
     {
-        options.AddReplacementValues(new ReplacementValue[] {
-        new ReplacementValue()
-            {
-                Key = "version",
-                Value = "1"
-            },
-            {
-                Key = "parentId",
-                Value = "4"
-            }
-        });
         options.AddBasicAuthentication("myuser", "mypassword");
         options.AddRequestFilters(new RequestFilter()
         {
@@ -38,10 +26,12 @@ SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
             TestTypes = new List<TestType>() { TestType.LoadTest },
             EndpointNameWhitelist = new string[] { "GetCategories" }
         });
+        options.AddBaseUrl(new Uri("https://dev.myapi.com"));
+        options.UseSwaggerExampleValues = true;
     });
 
 //To run the Swagger parser we need to pass an array of URLs
-IList<HttpTestRequest> requests = await swaggerSource.Load(new Uri[] {
+IEnumerable<HttpRequest> requests = await swaggerSource.Load(new Uri[] {
     new Uri("https://api.demo.com/swagger/v1/swagger.json"),
     new Uri("https://api2.demo.com/swagger/v1/swagger.json")
 });
@@ -51,24 +41,13 @@ The above code is quite simple, but it needs some explanation.
 
 ## Description
 
-#### 1. AddReplacementValues
-This is a method that will add key/value pairs for replacement values you need to replace in the Swagger requests.
-
-In the example above we say: "Replace `{version}` placeholder in Path and URL parameters and JSON body models."
-
-In other words, if you have a test API endpoint like this: https://api.demo.com/v{version}/categories?parent={parentId} that will be set to https://api.demo.com/v1/categories?parent=4.
-
-That, does not stop there, you can also populate JSON request bodies in this way:
-
-[TODO sample JSON Body]
-
-#### 2. AddBasicAuthentication
+#### 1. AddBasicAuthentication
 If your Swagger.json files are protected by basic authentication, you can set those with `AddBasicAuthentication`.
 
-#### 3, AddRequestFilters
-Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`.
+#### 2. AddRequestFilters
+Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`. All are optional.
 
-##### 3.1. AuthenticationTypes
+##### 2.1. AuthenticationTypes
 Here we specify a list of Authentication types, that will be filtered out from the whole swagger file. This is where QA Tool Kit presents a convention.
 The built-in types are:
 - `AuthenticationType.Customer` which specifies a string `"@customer"`,
@@ -79,7 +58,7 @@ The built-in types are:
 
 In order to apply filters, you need to tag your API endpoints with those strings.
 
-We normally do it in Swagger endpoint description. An example might be: `Get categories from the system. @customer,@administrator,@oauth2.`
+We normally do that, by adding the tags in the Swagger endpoint description. An example might be: `Get categories from the system. @customer,@administrator,@oauth2.`
 
 This is an example from swagger.json excerpt:
 
@@ -96,14 +75,14 @@ This is an example from swagger.json excerpt:
 
 Parser then finds those string in the description field and populates the `RequestFilter` property.
 
-##### 3.2 TestTypes
-Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in certain test scenarios. Currently libraray supports:
+##### 2.2 TestTypes
+Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in different test scenarios. Currently library supports:
 
 - TestType.LoadTest which specifies a string `"@loadtest"`,
 - TestType.IntegrationTest which specifies a string `"@integrationtest"`,
 - TestType.SecurityTest which specifies a string `"@securitytest"`,
 
-The same swagger-json excerpt which allows load and integration tests.
+The same swagger.json excerpt which support test type tags might look like this:
 
 ```json
 "/v{version}/categories?parent={parentId}": {
@@ -116,14 +95,35 @@ The same swagger-json excerpt which allows load and integration tests.
         "operationId": "GetCategories",
 ```
 
-##### 3.3 EndpointNameWhitelist
+If you feed the list of `HttpRequest` objects with load type tags to the library like `QAToolKit.Engine.Bombardier`, only those requests will be tested.
+
+##### 2.3 EndpointNameWhitelist
 Final `RequestFilter` option is `EndpointNameWhitelist`. With it you can specify a list of endpoints that will be included in the results.
 
-Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. That corresponds to the `operationId` in the swagger file above.
+Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. 
+That corresponds to the `operationId` in the swagger file above.
 
-## TO-DO
+#### 3. AddBaseUrl
+Your swagger file has a `Server section`, where you can specify an server URI and can be absolute or relative. An example of relative server section is:
+```json
+"servers": [
+    {
+        "url": "/api/v3"
+    }
+],
+```
+In case of relative paths you need to add an absolute base URL to `Swagger Processor` with `AddBaseUrl`, otherwise the one from the `Servers section` will be used.
 
-- Support for automatic model data generation.
+#### 4. UseSwaggerExampleValues
+You can set `UseSwaggerExampleValues = true` in the SwaggerOptions when creating new Swagger source object. This will
+check Swagger for example files and populate those.
+
+By default this option is set to false.
+
+## Limitations
+
+- Swagger processor only returns `application/json` content type. Support for other might come later.
+- Data generation and replacement is only supported for Path, Url and Json Body properties.
 
 ## License
 

@@ -1,0 +1,809 @@
+﻿openapi: 3.0.1
+info:
+  title: Helpdesk API v2
+  description: |
+    Resource API contains methods
+  version: "1.0"
+servers:
+- url: api/support/v2
+paths:
+  /SupportTicket:
+    get:
+      tags: 
+        - helpdesk
+      description: |
+        Get a list of helpdesks and their attachments
+        
+        Affected systems: DSystem
+      operationId: getSupportTicketsList
+      parameters: 
+        - name: CaseId
+          in: query
+          description: Case id of helpdesks to be returned
+          required: true
+          schema:
+            type: string
+            format: guid
+          example: "4c5cfc0c-cd11-ea11-a2bd-00155d685d2c"
+        - name: Area
+          in: query
+          description: Area the request is related to
+          schema:
+            type: string
+            enum: ["Company","Company2"]
+            default: "Company"
+          example: "Company"
+      responses:
+        200:
+          description: Response from helpdesks process
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetSupportTicketResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+    post:      
+      tags:
+        - helpdesk
+      description: |
+        Create helpdesk
+        
+        Affected systems: DSystem
+      operationId: postSupportTicket
+      requestBody:
+        description: Data used to create a new helpdesk
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSupportTicket'
+        required: true
+      responses:
+        200:
+          description: helpdesk successfully created
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateSupportTicketResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+  /SupportTicketCase:
+    get:
+      tags: 
+        - helpdesk Case
+      description: |
+        Get a list of helpdesk cases.
+        
+        Affected systems: DSystem
+      operationId: getSupportTicketCasesList
+      parameters: 
+        - name: IdentityId
+          in: query
+          description: Identity id of helpdesk cases to be returned
+          required: true
+          schema:
+            type: string
+            format: guid
+          example: "4c5cfc0c-cd11-ea11-a2bd-00155d685d2c"
+        - name: Area
+          in: query
+          description: Area the request is related to
+          schema:
+            type: string
+            enum: ["Company","Company2"]
+            default: "Company"
+          example: "Company"
+      responses:
+        200:
+          description: Response from helpdesk cases process
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetSupportTicketCaseResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+  /SupportTicketCase/{CaseId}:
+    patch:
+      tags:
+        - helpdesk Case
+      operationId: patchSupportTicketCase
+      description: |
+        Patch SupportTicketCase.
+        
+        Affected systems: DSystem
+      parameters:
+      - name: CaseId
+        in: path
+        description: Case id to update
+        required: true
+        example: "cfc0c-cd11-ea11-a2bd-00155d685d2c"
+        schema:
+          type: string
+          format: guid
+      - name: Area
+        in: query
+        description: Area the request is related to
+        schema:
+          type: string
+          enum: ["Company","Company2"]
+          default: "Company"
+        example: "Company"
+      requestBody:
+        description: SupportTicketCase patch data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchSupportTicketCase'
+        required: true
+      responses:
+        200:
+          description: Response from helpdesk cases process
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetSupportTicketCaseResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+  /ScheduledCall:
+    post:      
+      tags:
+        - ScheduledCall
+      description: |
+        Create scheduled call
+        
+        Affected systems: DSystem
+      operationId: postScheduledCall
+      requestBody:
+        description: Data used to create a new scheduled call record
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduledCall'
+        required: true
+      responses:
+        200:
+          description: Scheduled call record successfully created
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/responses/CreateScheduledCallResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+  /DirectDebitNotification:
+    post:      
+      tags:
+        - DirectDebitNotification
+      description: |
+        Sends an email to the salda konte department with information about direct debit request
+        
+        Affected systems: 
+      operationId: postDirectDebitNotification
+      requestBody:
+        description: Data used to send a direct debit email
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendDiretDebitNotification'
+        required: true
+      responses:
+        200:
+          $ref: '#/components/responses/DirectDebitNotificationResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+  /Contact:
+    post:      
+      tags:
+        - Contact
+      description: |
+        Create or update a contact
+        
+        Affected systems: DSystem
+      operationId: postContact
+      requestBody:
+        description: Data used to create a new contact or update existing
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContact'
+        required: true
+      responses:
+        200:
+          description: Contact successfully created or updated
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/responses/CreateContactResponse'
+        400:
+          $ref: '#/components/responses/CompanyErrorClientResponse'
+        404:
+          $ref: '#/components/responses/CompanyErrorNotFoundResponse'
+        500:
+          $ref: '#/components/responses/CompanyErrorServerResponse'
+components:
+  responses:
+    CompanyErrorClientResponse:
+      description: Client error
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Client Error
+            properties:
+              ErrorMessage:
+                type: string
+                description: Error Message
+                readOnly: true
+                example: "Agreement Id is not in correct format"
+              ErrorCode:
+                type: string
+                description: Error code
+                readOnly: true
+                example: "1-1001"
+              Identifier:
+                type: string
+                description: Identifier, internal  identifier
+                readOnly: true
+                example: "ResponseHandlingPublisher | Error response | System Test Err response"
+              Details:
+                type: string
+                description: Error details
+                readOnly: true
+                example: "Error: Agreement Id must start with a letter A followed by 6 digits."
+    CompanyErrorNotFoundResponse:
+      description: Not found error
+      content:
+        application/json:
+          schema:
+            type: object
+            description: NotFound Error
+            properties:
+              ErrorMessage:
+                type: string
+                description: Error Message
+                readOnly: true
+                example: "Invalid path"
+              ErrorCode:
+                type: string
+                description: Error code
+                readOnly: true
+                example: "0-5"
+              Identifier:
+                type: string
+                description: Identifier, internal  identifier
+                readOnly: true
+                example: "ResponseHandlingPublisher | Error response | System Test Err response"
+              Details:
+                type: string
+                description: Error details
+                readOnly: true
+                example: "Wrong path provided! This connector accepts only /Person or /Agreement"
+    CompanyErrorServerResponse:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Server Error
+            properties:
+              ErrorMessage:
+                type: string
+                description: Error Message
+                readOnly: true
+                example: "System not available"
+              ErrorCode:
+                type: string
+                description: Error code
+                readOnly: true
+                example: "0-2"
+              Identifier:
+                type: string
+                description: Identifier, internal  identifier
+                readOnly: true
+                example: "ResponseHandlingPublisher | Error response | System Test Err response"
+              Details:
+                type: string
+                description: Error details
+                readOnly: true
+                example: "Error: The server was not found or was not accessible."
+    CreateScheduledCallResponse:
+      description: Scheduled call data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              Success:
+                type: boolean
+                description: Endpoint response success
+                example: true
+              CaseIdOutput:
+                type: string
+                description: GUID of the case created that serves as a container for the helpdesks
+                example: "15E93CE6-10E1-E911-A2B7-00155D685D2C"
+    DirectDebitNotificationResponse:
+      description: Notification sent successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Data that was sent to SMTP
+            properties:
+              From:
+                type: string
+                example: "my@Agent.si"
+              To:
+                type: array
+                items:
+                  type: string
+                  example: "receivables@Agent.eu"
+              Cc:
+                type: array
+                example: null
+                items:
+                  type: string
+              Subject:
+                type: string
+                example: "example"
+              Body:
+                type: string
+                example: "HI!"
+              Attachments:
+                type: array
+                example: null
+                items:
+                  type: string
+              IsBodyHtml:
+                type: boolean
+                example: false
+    CreateContactResponse:
+      description: Contact data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              Success:
+                type: boolean
+                description: Endpoint response success
+                example: true
+              ContactIdOutput:
+                type: string
+                description: GUID of the contact
+                example: "15E93CE6-10E1-E911-A2B7-00155D685D2C"
+  schemas:
+    GetSupportTicketResponse:
+      type: object
+      properties:
+        CaseId:
+          type: string
+          format: guid
+          description: Case id
+          example: "4c5cfc0c-cd11-ea11-a2bd-00155d685d2c"
+        Title:
+          type: string
+          description: Case title
+          example: "Contract | Changes"
+        Status:
+          type: string
+          description: Case status
+          example: "Solving"
+        IdentityId:
+          type: string
+          format: guid
+          description: Identity id
+          example: "78b6f9b7-30df-e711-80c4-00155d101f1b"
+        CreatedOn:
+          type: string
+          format: date
+          description: Datetime the case was created on
+          example: '2019-09-03T00:00:00.000Z'
+        Tickets:
+          type: array
+          items:
+            type: object
+            properties:
+              ParentCase:
+                type: string
+                format: guid
+                description: Case id this helpdesk is connected
+                example: "4c5cfc0c-cd11-ea11-a2bd-00155d685d2c"
+              Subject:
+                type: string
+                description: helpdesk subject
+                example: "Wrong 2019"
+              Message:
+                type: string
+                description: helpdesk message
+                example: "Call me maybe."
+              Direction:
+                type: integer
+                enum: [0,1]
+                description: Message direction:0-Inbound (Portal -> System) or 1-Outbound (System -> Portal)
+                example: 0
+              Attachments:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    FileId:
+                      type: string
+                      format: guid
+                      description: Attachment file id
+                      example: "90f7cad8-dbc0-41e2-b64e-e290e064b19f"
+                    FileUri:
+                      type: string
+                      format: uri
+                      description: Attachment file uri
+                      example: "/folder/Lorem-Ipsum.pdf"
+                    FileName:
+                      type: string
+                      description: Attachment file name
+                      example: "Lorem-Ipsum.pdf"
+    CreateSupportTicket:
+      description: Data used to create a new helpdesk
+      required:
+      - Area
+      - Direction
+      - IdentityId
+      - Message 
+      - CaseType
+      type: object
+      properties:
+        Area:
+          description: Area the request is related to
+          type: string
+          enum: ["Company","Company2"]
+          example: "Company"
+        Direction:
+          type: integer
+          enum: [0, 1]
+          description: 0-Inbound (Portal -> System) or 1-Outbound (System -> Portal)
+          example: 0
+        IdentityId:
+          type: string
+          description: Identity id
+          example: "4205FFFE-179B-E411-80C0-00155D788951"
+        CaseIdInput:
+          type: string
+          description: Case GUID. A new case and helpdesk is created if empty, otherwise only support ticker is created.
+          example: "4205FFFE-179B-E411-80C0-00155D788951"
+        Subject:
+          type: string
+          description: Initial helpdesk title
+          example: "Wrong 11111"
+        Message:
+          type: string
+          description: helpdesk message
+          example: "Error 11111."
+        CaseType:
+          type: string
+          description: Case type
+          enum: ["SupportTicket","InvoiceSettingsChange","BillingAddressChange"]
+          example: "SupportTicket"
+        ConsolidationGroupId:
+          type: string
+          description: Consolidation group id
+          example: "24562456245624"
+        ConnectionId:
+          type: string
+          description: Metering point
+          example: "1-6245624562456"
+        IBAN:
+          type: string
+          description: Mandatory when Case type is InvoiceSettingsChange
+          example: "SI245624562464256"
+        Description:
+          type: string
+          description: Mandatory when Case type is InvoiceSettingsChange
+          example: "Bank"
+        InvoiceType:
+          type: string
+          description: Mandatory when Case type is InvoiceSettingsChange
+          example: "PaperInvoice"
+        BillingAddressesChanges:
+          type: array
+          description: Mandatory when Case type is BillingAddressChange
+          items:
+            type: object
+            properties:
+              AgreementId:
+                type: string
+                example: "008"
+              ConnectionId:
+                type: string
+                example: "4564-4564564"
+              FirstName:
+                type: string
+                example: "John"
+              LastName:
+                type: string
+                example: "Doe"
+              Street:
+                type: string
+                example: "My street"
+              StreetNumber:
+                type: string
+                example: "21"
+              City:
+                type: string
+                example: "London"
+              PostCode:
+                type: string
+                example: "1111"
+              Country:
+                type: string                
+                example: "UK"
+        Attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              FileId:
+                type: string
+                format: guid
+                description: Attachment file id
+                example: "90f7cad8-dbc0-41e2-b64e-e290e064b19f"
+              FileUri:
+                type: string
+                format: uri
+                description: Attachment file uri
+                example: "/folder/Lorem-Ipsum.pdf"
+              FileName:
+                type: string
+                description: Attachment file name
+                example: "Lorem-Ipsum.pdf"
+    CreateSupportTicketResponse:
+      type: object
+      description: helpdesk data
+      properties:
+        Success:
+          type: boolean
+          description: Endpoint response success
+          example: true
+        CaseIdOutput:
+          type: string
+          description: GUID of the case created that serves as a container for the helpdesks
+          example: "15E93CE6-10E1-E911-A2B7-00155D685D2C"
+    GetSupportTicketCaseResponse:
+      type: object
+      properties:
+        CaseId:
+          type: string
+          format: guid
+          description: Case id
+          example: "4c5cfc0c-cd11-ea11-a2bd-00155d685d2c"
+        ConnectionId:
+          type: string
+          description: Metering point
+          example: 12-324523
+        Title:
+          type: string
+          description: Case title
+          example: "Contract management | Changes"
+        Status:
+          type: string
+          description: Case status
+          example: "Suitable For Solving"
+        StatusCode:
+          type: string
+          description: Case status code
+          example: "23453245254"
+        HandedTo:
+          type: string
+          example: "Claim Dept"
+        HandedToCode:
+          type: string  
+          example: "23453245235"
+        CreatedOn:
+          type: string
+          format: date
+          description: Datetime the case was created on
+          example: "2019-12-06T11:36:58Z"
+        ModifiedOn:
+          type: string
+          format: date
+          description: Datetime the case was modified on
+          example: "2019-12-06T09:40:36Z"
+        ModifiedBy:
+          type: string
+          description: Name of the person who modified the case
+          example: "Agent"
+        CaseType: 
+          type: string
+          description: Case type
+          enum: ["helpdesk","Scheduled Call"]
+          example: helpdesk
+        IsRead:
+          type: boolean
+          example: false
+        LastSupportTicketDirection:
+          type: integer
+          enum: [0, 1]
+          description: 0-Inbound (Portal -> System) or 1-Outbound (System -> Portal)
+          example: 0
+    PatchSupportTicketCase:
+      description: Patch SupportTicketCase data
+      required:
+      - IsRead
+      type: object
+      properties:
+        IsRead:
+          type: boolean
+          description: Is SupportTicketCase read
+          example: true
+    CreateScheduledCall:
+      description: Data used to create a new scheduled call record
+      required:
+      - Area
+      - Direction
+      - IdentityId
+      - Message 
+      type: object
+      properties:
+        Area:
+          description: Area the request is related to
+          type: string
+          enum: ["Company","Company2"]
+          example: "Company"
+        Direction:
+          type: integer
+          enum: [0, 1]
+          description: 0-Inbound (Portal -> System) or 1-Outbound (System -> Portal)
+          example: 0
+        IdentityId:
+          type: string
+          description: Identity id
+          example: "4205FFFE-179B-E411-80C0-00155D788951"
+        CaseIdInput:
+          type: string
+          description: Case id
+          example: "4205FFFE-179B-E411-80C0-00155D788951"
+        Message:
+          type: string
+          description: Scheduled call message
+          example: "Error 1111."
+        PhoneNumber:
+          type: string
+          example: "999 999 999"
+        CallDateTime:
+          type: string
+          format: date-time
+          example: "2019-12-18T04:00:00.000Z"
+        ConnectionId:
+          type: string
+          description: Metering point
+          example: 1-1345145
+        ConsolidationGroupId:
+          type: string
+          description: Consolidation group id
+          example: "2345135345134"
+        Attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              FileId:
+                type: string
+                format: guid
+                description: Attachment file id
+                example: "90f7cad8-dbc0-41e2-b64e-e290e064b19f"
+              FileUri:
+                type: string
+                format: uri
+                description: Attachment file uri
+                example: "/folder/Lorem-Ipsum.pdf"
+              FileName:
+                type: string
+                description: Attachment file name
+                example: "Lorem-Ipsum.pdf"
+    SendDiretDebitNotification:
+      type: object
+      description: helpdesk data
+      required:
+      - Subject
+      - Body
+      properties:
+        Subject:
+          type: string
+          description: Email subject
+          example: "dfg"
+        Body:
+          type: string
+          description: Email body
+          example: "Hi"
+        IsBodyHtml:
+          type: boolean
+          default: false
+          description: Is body in html format
+          example: false
+    CreateContact:
+      description: Data used to create a new contact or update existing
+      required:
+      - Area
+      - FirstName
+      - LastName
+      - Email
+      type: object
+      properties:
+        Area:
+          description: Area the request is related to
+          type: string
+          enum: ["Company","Company2"]
+          example: "Company"
+        IdentityId:
+          type: string
+          format: guid
+          description: null when creating a new contact, otherwise existing identity id
+          example: "B9CD737F-BA3E-EA11-A2C2-00155D685D2C"
+        StatusCode:
+          type: integer
+          description: Status code
+          example: 1
+        FirstName:
+          type: string
+          description: First name
+          example: "John"
+        LastName:
+          type: string
+          description: Last name
+          example: "Doe"
+        Email:
+          type: string
+          example: "john.doe@Agent.si"
+        TelephoneNumber:
+          type: string
+          example: "356735673567"
+        MobileNumber:
+          type: string
+          example: "356735863583"
+        Address:
+          type: string
+          description: Address
+          example: "My street 1"
+        PostName:
+          type: string
+          description: Post name
+          example: "London"
+        PostNumber:
+          type: string
+          description: Post number
+          example: "1111"
+        Country:
+          type: string
+          description: Country
+          example: "UK"

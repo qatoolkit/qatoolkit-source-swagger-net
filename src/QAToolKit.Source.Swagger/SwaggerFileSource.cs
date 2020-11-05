@@ -5,6 +5,7 @@ using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace QAToolKit.Source.Swagger
@@ -12,7 +13,7 @@ namespace QAToolKit.Source.Swagger
     /// <summary>
     /// Swagger file source
     /// </summary>
-    public class SwaggerFileSource : ITestSource<IList<FileInfo>, IList<HttpTestRequest>>
+    public class SwaggerFileSource : ITestSource<IEnumerable<FileInfo>, IEnumerable<HttpRequest>>
     {
         private readonly SwaggerOptions _swaggerOptions;
 
@@ -31,14 +32,12 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<IList<HttpTestRequest>> Load(IList<FileInfo> source)
+        public Task<IEnumerable<HttpRequest>> Load(IEnumerable<FileInfo> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            if (_swaggerOptions.BaseUrl == null) throw new Exception("Swagger from file source needs BaseUrl defined. If absolute URL is defined in swagger file, that one will be used.");
-
-            var restRequests = new List<HttpTestRequest>();
-            var processor = new SwaggerProcessor();
+            var restRequests = new List<HttpRequest>();
+            var processor = new SwaggerProcessor(_swaggerOptions);
 
             foreach (var filePath in source)
             {
@@ -51,29 +50,11 @@ namespace QAToolKit.Source.Swagger
 
                     var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument);
 
-                    if (_swaggerOptions.UseRequestFilter)
-                    {
-                        var filters = new SwaggerRequestFilter(requests);
-                        requests = filters.FilterRequests(_swaggerOptions.RequestFilter);
-                    }
-
-                    if (_swaggerOptions.UseDataGeneration)
-                    {
-                        var generator = new SwaggerDataGenerator(requests);
-                        requests = generator.GenerateModelValues();
-                    }
-
-                    if (_swaggerOptions.ReplacementValues != null)
-                    {
-                        var generator = new SwaggerValueReplacement(requests, _swaggerOptions.ReplacementValues);
-                        requests = generator.ReplaceAll();
-                    }
-
                     restRequests.AddRange(requests);
                 }
             }
 
-            return restRequests;
+            return Task.FromResult(restRequests.AsEnumerable());
         }
     }
 }

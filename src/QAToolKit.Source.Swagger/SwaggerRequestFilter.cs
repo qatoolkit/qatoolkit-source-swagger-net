@@ -1,4 +1,5 @@
 ﻿using QAToolKit.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,24 +10,24 @@ namespace QAToolKit.Source.Swagger
     /// </summary>
     public class SwaggerRequestFilter
     {
-        private readonly IList<HttpTestRequest> _requests;
+        private readonly IEnumerable<HttpRequest> _requests;
 
         /// <summary>
         /// Swagger Request filter
         /// </summary>
         /// <param name="requests"></param>
-        public SwaggerRequestFilter(IList<HttpTestRequest> requests)
+        public SwaggerRequestFilter(IEnumerable<HttpRequest> requests)
         {
-            _requests = requests;
+            _requests = requests ?? throw new ArgumentNullException(nameof(requests));
         }
         /// <summary>
         /// Filter out the requests by the specified filters
         /// </summary>
         /// <param name="requestFilter"></param>
         /// <returns></returns>
-        public IList<HttpTestRequest> FilterRequests(RequestFilter requestFilter)
+        public IEnumerable<HttpRequest> FilterRequests(RequestFilter requestFilter)
         {
-            var requestsLocal = new List<HttpTestRequest>();
+            var requestsLocal = new List<HttpRequest>();
 
             if (requestFilter.AuthenticationTypes != null)
             {
