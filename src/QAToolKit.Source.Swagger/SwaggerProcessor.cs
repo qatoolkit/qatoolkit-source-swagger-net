@@ -259,19 +259,14 @@ namespace QAToolKit.Source.Swagger
 
         private Location GetPlacement(ParameterLocation In)
         {
-            switch (In)
+            return In switch
             {
-                case ParameterLocation.Query:
-                    return Location.Query;
-                case ParameterLocation.Path:
-                    return Location.Path;
-                case ParameterLocation.Header:
-                    return Location.Header;
-                case ParameterLocation.Cookie:
-                    return Location.Cookie;
-                default:
-                    throw new QAToolKitSwaggerException($"Invalid parameter location '{In}'.");
-            }
+                ParameterLocation.Query => Location.Query,
+                ParameterLocation.Path => Location.Path,
+                ParameterLocation.Header => Location.Header,
+                ParameterLocation.Cookie => Location.Cookie,
+                _ => throw new QAToolKitSwaggerException($"Invalid parameter location '{In}'."),
+            };
         }
 
         private List<RequestBody> GetRequestBodies(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
