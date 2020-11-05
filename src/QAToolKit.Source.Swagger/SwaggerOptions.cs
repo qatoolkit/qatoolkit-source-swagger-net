@@ -65,11 +65,8 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddRequestFilters(RequestFilter requestFilter)
         {
-            if (requestFilter == null)
-                throw new ArgumentException(nameof(requestFilter));
-
             UseRequestFilter = true;
-            RequestFilter = requestFilter;
+            RequestFilter = requestFilter ?? throw new ArgumentException(nameof(requestFilter));
             return this;
         }
 
@@ -80,10 +77,7 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddBaseUrl(Uri baseUrl)
         {
-            if (baseUrl == null)
-                throw new ArgumentException(nameof(baseUrl));
-
-            BaseUrl = baseUrl;
+            BaseUrl = baseUrl ?? throw new ArgumentException(nameof(baseUrl));
             return this;
         }
     }

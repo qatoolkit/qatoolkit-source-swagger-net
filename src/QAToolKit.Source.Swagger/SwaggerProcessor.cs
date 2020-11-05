@@ -199,35 +199,22 @@ namespace QAToolKit.Source.Swagger
 
         private HttpStatusCode? GetHttpStatus(string statusCode)
         {
-            switch (statusCode)
+            return statusCode switch
             {
-                case "200":
-                    return HttpStatusCode.OK;
-                case "201":
-                    return HttpStatusCode.Created;
-                case "202":
-                    return HttpStatusCode.Accepted;
-                case "204":
-                    return HttpStatusCode.NoContent;
-                case "400":
-                    return HttpStatusCode.BadRequest;
-                case "401":
-                    return HttpStatusCode.Unauthorized;
-                case "403":
-                    return HttpStatusCode.Forbidden;
-                case "404":
-                    return HttpStatusCode.NotFound;
-                case "405":
-                    return HttpStatusCode.MethodNotAllowed;
-                case "409":
-                    return HttpStatusCode.Conflict;
-                case "500":
-                    return HttpStatusCode.InternalServerError;
-                case "default":
-                    return null;
-                default:
-                    throw new QAToolKitSwaggerException("HttpStatusCode not found.");
-            }
+                "200" => HttpStatusCode.OK,
+                "201" => HttpStatusCode.Created,
+                "202" => HttpStatusCode.Accepted,
+                "204" => HttpStatusCode.NoContent,
+                "400" => HttpStatusCode.BadRequest,
+                "401" => HttpStatusCode.Unauthorized,
+                "403" => HttpStatusCode.Forbidden,
+                "404" => HttpStatusCode.NotFound,
+                "405" => HttpStatusCode.MethodNotAllowed,
+                "409" => HttpStatusCode.Conflict,
+                "500" => HttpStatusCode.InternalServerError,
+                "default" => null,
+                _ => throw new QAToolKitSwaggerException("HttpStatusCode not found."),
+            };
         }
 
         private string GetSummary(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
@@ -311,7 +298,7 @@ namespace QAToolKit.Source.Swagger
                 {
                     var requestBody = new RequestBody
                     {
-                        Name = contentType.Value.Schema.Reference != null ? contentType.Value.Schema.Reference.Id : null,
+                        Name = contentType.Value.Schema.Reference?.Id,
                         ContentType = ContentType.ToEnum(contentType.Key),
                         Properties = null,
                         Required = openApiOperation.Value.RequestBody.Required
@@ -334,9 +321,8 @@ namespace QAToolKit.Source.Swagger
 
                 return requests;
             }
-            catch (Exception ex)
+            catch
             {
-                var msg = ex.Message;
                 return new List<RequestBody>();
             }
         }
@@ -357,7 +343,7 @@ namespace QAToolKit.Source.Swagger
                     Format = source.Value.Items.Description,
                     Type = source.Value.Items.Type,
                     Properties = null,
-                    Name = source.Value.Items.Reference != null ? source.Value.Items.Reference.Id : null
+                    Name = source.Value.Items.Reference?.Id
                 };
                 itemsProperty.Required = source.Value.Items.Required.Contains(itemsProperty.Name);
 
@@ -390,7 +376,7 @@ namespace QAToolKit.Source.Swagger
                     Format = null,
                     Type = "enum",
                     Properties = new List<Property>(),
-                    Name = source.Value.Reference != null ? source.Value.Reference.Id : null,
+                    Name = source.Value.Reference?.Id,
                 };
                 enumProperty.Required = source.Value.Required.Contains(enumProperty.Name);
 
