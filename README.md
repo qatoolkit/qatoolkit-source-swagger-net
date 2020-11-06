@@ -98,9 +98,9 @@ The same swagger.json excerpt which support test type tags might look like this:
 If you feed the list of `HttpRequest` objects with load type tags to the library like `QAToolKit.Engine.Bombardier`, only those requests will be tested.
 
 ##### 2.3 EndpointNameWhitelist
-Final `RequestFilter` option is `EndpointNameWhitelist`. With it you can specify a list of endpoints that will be included in the results.
+Final `RequestFilter` option is `EndpointNameWhitelist`. You can specify a list of endpoints that will be included in the results.
 
-Every other endpoint will be excluded. In the sample above we have set the result to include only `GetCategories` endpoint. 
+Every other endpoint will be excluded from the results. In the sample above we have set the result to include only `GetCategories` endpoint. 
 That corresponds to the `operationId` in the swagger file above.
 
 #### 3. AddBaseUrl
