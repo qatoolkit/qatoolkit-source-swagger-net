@@ -4,12 +4,13 @@
 		<TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>latest</LangVersion>
+		<ProjectGuid>ee940718-945a-4c34-8ce6-0790972ada44</ProjectGuid>
 
 		<!-- NuGet Metadata -->
 		<IsPackable>true</IsPackable>
 		<PackageVersion>$(Version)</PackageVersion>
 		<PackageId>QAToolKit.Source.Swagger</PackageId>
-		<Authors>QAToolKit</Authors>
+		<Authors>Miha Jakovac</Authors>
 		<Description>
 			QAToolKit Swagger library, that parses Swagger files and produces a common list of HTTP requests.
 		</Description>
@@ -33,7 +34,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Faker.Net" Version="1.3.82" />
 		<PackageReference Include="Microsoft.OpenApi" Version="1.2.3" />
 		<PackageReference Include="Microsoft.OpenApi.Readers" Version="1.2.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
