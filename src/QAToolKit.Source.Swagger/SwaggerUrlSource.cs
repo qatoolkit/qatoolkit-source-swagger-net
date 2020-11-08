@@ -34,10 +34,15 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<HttpRequest>> Load(Uri[] source)
+        public Task<IEnumerable<HttpRequest>> Load(Uri[] source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
+            return LoadInternal(source);
+        }
+
+        private async Task<IEnumerable<HttpRequest>> LoadInternal(Uri[] source)
+        {
             var restRequests = new List<HttpRequest>();
             var processor = new SwaggerProcessor(_swaggerOptions);
 
