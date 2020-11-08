@@ -85,7 +85,7 @@ namespace QAToolKit.Source.Swagger
                     Summary = GetSummary(operation),
                     Description = GetDescription(operation),
                     OperationId = GetOperationId(operation),
-                    Parameters = GetParameters(operation).ToList().ToList(),
+                    Parameters = GetParameters(operation).ToList(),
                     RequestBodies = GetRequestBodies(operation),
                     Responses = GetResponses(operation),
                     Tags = GetTags(operation),
@@ -425,11 +425,10 @@ namespace QAToolKit.Source.Swagger
             {
                 var propsTem = GetPropertiesRecursively(property);
 
-                if (propsTem != null)
-                    if (prop.Properties == null)
-                    {
-                        prop.Properties = new List<Property>();
-                    }
+                if (propsTem != null && prop.Properties == null)
+                {
+                    prop.Properties = new List<Property>();
+                }
                 prop.Properties.AddRange(propsTem);
             }
 
