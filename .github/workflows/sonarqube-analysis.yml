@@ -19,7 +19,7 @@ jobs:
         sonarProjectName:  qatoolkit_qatoolkit-source-swagger-net
         sonarOrganization: qatoolkit
         dotnetBuildArguments: ./src/QAToolKit.Source.Swagger/QAToolKit.Source.Swagger.csproj
-        dotnetTestArguments: ./src/QAToolKit.Core.Swagger.Test/QAToolKit.Core.Swagger.Test.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        dotnetTestArguments: ./src/QAToolKit.Source.Swagger.Test/QAToolKit.Source.Swagger.Test.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
         sonarBeginArguments: /d:sonar.verbose="true" /d:sonar.language="cs" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" /d:sonar.coverage.exclusions="**Tests.cs"
         sonarHostname: "https://sonarcloud.io"
       env:
