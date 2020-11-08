@@ -31,12 +31,12 @@ namespace QAToolKit.Source.Swagger
 
             if (requestFilter.AuthenticationTypes != null)
             {
-                requestsLocal.AddRange(_requests.Where(request => requestFilter.AuthenticationTypes.ToList().Any(x => request.AuthenticationTypes.Contains(x))));
+                requestsLocal.AddRange(_requests.Where(request => requestFilter.AuthenticationTypes.Any(x => request.AuthenticationTypes.Contains(x))));
             }
 
             if (requestFilter.TestTypes != null)
             {
-                requestsLocal.AddRange(_requests.Where(request => requestFilter.TestTypes.ToList().Any(x => request.TestTypes.Contains(x))));
+                requestsLocal.AddRange(_requests.Where(request => requestFilter.TestTypes.Any(x => request.TestTypes.Contains(x))));
             }
 
             if (requestFilter.EndpointNameWhitelist != null)

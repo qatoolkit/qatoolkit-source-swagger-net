@@ -1,6 +1,10 @@
 # QAToolKit.Source.Swagger
 ![.NET Core](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
+![CodeQL Analyze](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/CodeQL%20Analyze/badge.svg)
+![Sonarqube Analyze](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/Sonarqube%20Analyze/badge.svg)
+![](https://img.shields.io/nuget/v/QAToolKit.Source.Swagger?label=QAToolKit.Source.Swagger)
 
+## Description
 `QAToolKit.Source.Swagger` is a .NET standard library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
 
 Major features:
@@ -120,8 +124,9 @@ check Swagger for example files and populate those.
 
 By default this option is set to false.
 
-## Limitations
+## To-do
 
+- **This library is an early alpha version**
 - Swagger processor only returns `application/json` content type. Support for other might come later.
 - Data generation and replacement is only supported for Path, Url and Json Body properties.
 
