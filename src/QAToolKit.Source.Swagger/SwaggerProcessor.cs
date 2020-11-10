@@ -36,6 +36,11 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public IEnumerable<HttpRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
         {
+            if (openApiDocument == null || openApiDocument.Paths == null)
+            {
+                throw new ArgumentNullException(nameof(openApiDocument));
+            }
+
             var restRequests = new List<HttpRequest>();
 
             var server = openApiDocument.Servers.FirstOrDefault();
