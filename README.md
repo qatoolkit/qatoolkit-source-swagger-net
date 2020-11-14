@@ -1,11 +1,13 @@
 # QAToolKit.Source.Swagger
-![.NET Core](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
-![CodeQL Analyze](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/CodeQL%20Analyze/badge.svg)
-![Sonarqube Analyze](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/Sonarqube%20Analyze/badge.svg)
-![](https://img.shields.io/nuget/v/QAToolKit.Source.Swagger?label=QAToolKit.Source.Swagger)
+![https://github.com/qatoolkit/qatoolkit-source-swagger-net/actions](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
+![https://github.com/qatoolkit/qatoolkit-source-swagger-net/security/code-scanning](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/CodeQL%20Analyze/badge.svg)
+![https://sonarcloud.io/dashboard?id=qatoolkit_qatoolkit-source-swagger-net](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/Sonarqube%20Analyze/badge.svg)
+![https://www.nuget.org/packages/QAToolKit.Source.Swagger/](https://img.shields.io/nuget/v/QAToolKit.Source.Swagger?label=QAToolKit.Source.Swagger)
 
 ## Description
-`QAToolKit.Source.Swagger` is a .NET standard library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
+`QAToolKit.Source.Swagger` is a .NET library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
+
+Supported .NET frameworks and standards: `netstandard2.0`, `netstandard2.1`, `netcoreapp3.1`, `net5.0`
 
 Major features:
 

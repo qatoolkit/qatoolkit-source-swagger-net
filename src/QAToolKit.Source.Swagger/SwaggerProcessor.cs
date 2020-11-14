@@ -36,6 +36,11 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public IEnumerable<HttpRequest> MapFromOpenApiDocument(Uri baseUri, OpenApiDocument openApiDocument)
         {
+            if (openApiDocument == null || openApiDocument.Paths == null)
+            {
+                throw new ArgumentNullException(nameof(openApiDocument));
+            }
+
             var restRequests = new List<HttpRequest>();
 
             var server = openApiDocument.Servers.FirstOrDefault();
@@ -192,6 +197,9 @@ namespace QAToolKit.Source.Swagger
                 case "patch":
                     return HttpMethod.Patch;
 #elif NETCOREAPP3_1
+                case "patch":
+                    return HttpMethod.Patch;
+#elif NET5_0
                 case "patch":
                     return HttpMethod.Patch;
 #endif
