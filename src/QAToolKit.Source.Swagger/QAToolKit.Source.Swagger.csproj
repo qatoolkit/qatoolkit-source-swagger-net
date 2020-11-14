@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net5.0</TargetFrameworks>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>latest</LangVersion>
 		<ProjectGuid>ee940718-945a-4c34-8ce6-0790972ada44</ProjectGuid>
@@ -37,7 +37,7 @@
 		<PackageReference Include="Microsoft.OpenApi" Version="1.2.3" />
 		<PackageReference Include="Microsoft.OpenApi.Readers" Version="1.2.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-		<PackageReference Include="QAToolKit.Core" Version="0.2.4" />
+		<PackageReference Include="QAToolKit.Core" Version="0.3.0" />
 	</ItemGroup>
 
 </Project>

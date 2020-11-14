@@ -199,6 +199,9 @@ namespace QAToolKit.Source.Swagger
 #elif NETCOREAPP3_1
                 case "patch":
                     return HttpMethod.Patch;
+#elif NET5_0
+                case "patch":
+                    return HttpMethod.Patch;
 #endif
                 default:
                     throw new QAToolKitSwaggerException($"HttpMethod invalid '{httpMethodString}'.");
