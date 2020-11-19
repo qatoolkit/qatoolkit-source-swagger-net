@@ -86,5 +86,49 @@ namespace QAToolKit.Source.Swagger.Test
                       new Uri("https://github.com")
                 }));
         }
+
+        [Fact]
+        public async Task SwaggerUrlSourceWithBasicAuthTest_Successfull()
+        {
+            var swaggerSource = new SwaggerUrlSource(
+              options =>
+              {
+                  options.AddRequestFilters(new RequestFilter()
+                  {
+                      EndpointNameWhitelist = new string[] { "getPetById", "addPet" }
+                  });
+                  options.AddBasicAuthentication("test", "test");
+              });
+
+            var requests = await swaggerSource.Load(new Uri[] {
+                   new Uri("https://petstore3.swagger.io/api/v3/openapi.json")
+              });
+
+            _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
+
+            Assert.NotNull(requests);
+        }
+
+        [Fact]
+        public async Task SwaggerUrlSourceWithNTLMAuthTest_Successfull()
+        {
+            var swaggerSource = new SwaggerUrlSource(
+              options =>
+              {
+                  options.AddRequestFilters(new RequestFilter()
+                  {
+                      EndpointNameWhitelist = new string[] { "getPetById", "addPet" }
+                  });
+                  options.AddNTLMAuthentication("test", "test");
+              });
+
+            var requests = await swaggerSource.Load(new Uri[] {
+                   new Uri("https://petstore3.swagger.io/api/v3/openapi.json")
+              });
+
+            _logger.LogInformation(JsonConvert.SerializeObject(requests, Formatting.Indented));
+
+            Assert.NotNull(requests);
+        }
     }
 }
