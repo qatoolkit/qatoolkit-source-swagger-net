@@ -60,7 +60,7 @@ namespace QAToolKit.Source.Swagger
                         }
                         else
                         {
-                            new NetworkCredential(_swaggerOptions.UserName, _swaggerOptions.Password);
+                            credentials = new NetworkCredential(_swaggerOptions.UserName, _swaggerOptions.Password);
                         }
 
                         var credentialsCache = new CredentialCache { { uri, "NTLM", credentials } };
