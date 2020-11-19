@@ -5,6 +5,7 @@ using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -48,24 +49,53 @@ namespace QAToolKit.Source.Swagger
 
             foreach (var uri in source)
             {
-                using (var httpClient = new HttpClient())
+                using (var handler = new HttpClientHandler())
                 {
-                    if (_swaggerOptions.UseBasicAuth)
+                    if (_swaggerOptions.UseNTLMAuth)
                     {
-                        var authenticationString = $"{_swaggerOptions.UserName}:{_swaggerOptions.Password}";
-                        var base64EncodedAuthenticationString = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(authenticationString));
-                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                        var credentials = new NetworkCredential();
+                        if (string.IsNullOrEmpty(_swaggerOptions.UserName) || string.IsNullOrEmpty(_swaggerOptions.Password))
+                        {
+                            credentials = CredentialCache.DefaultNetworkCredentials;
+                        }
+                        else
+                        {
+                            new NetworkCredential(_swaggerOptions.UserName, _swaggerOptions.Password);
+                        }
+
+                        var credentialsCache = new CredentialCache { { uri, "NTLM", credentials } };
+                        handler.Credentials = credentialsCache;
                     }
 
-                    var stream = await httpClient.GetStreamAsync(uri);
+                    if (_swaggerOptions.DisableSSLValidation && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                    {
+                        handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                        handler.ServerCertificateCustomValidationCallback =
+                        (httpRequestMessage, cert, cetChain, policyErrors) =>
+                        {
+                            return true;
+                        };
+                    }
 
-                    var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
-                    var textWritter = new OpenApiJsonWriter(new StringWriter());
-                    openApiDocument.SerializeAsV3(textWritter);
+                    using (var httpClient = new HttpClient(handler))
+                    {
+                        if (_swaggerOptions.UseBasicAuth)
+                        {
+                            var authenticationString = $"{_swaggerOptions.UserName}:{_swaggerOptions.Password}";
+                            var base64EncodedAuthenticationString = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(authenticationString));
+                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                        }
 
-                    var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
+                        var stream = await httpClient.GetStreamAsync(uri);
 
-                    restRequests.AddRange(requests);
+                        var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
+                        var textWritter = new OpenApiJsonWriter(new StringWriter());
+                        openApiDocument.SerializeAsV3(textWritter);
+
+                        var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
+
+                        restRequests.AddRange(requests);
+                    }
                 }
             }
 

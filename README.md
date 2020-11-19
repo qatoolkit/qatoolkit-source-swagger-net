@@ -50,10 +50,29 @@ The above code is quite simple, but it needs some explanation.
 #### 1. AddBasicAuthentication
 If your Swagger.json files are protected by basic authentication, you can set those with `AddBasicAuthentication`.
 
-#### 2. AddRequestFilters
+#### 2. AddNTLMAuthentication
+If your Swagger.json files are protected by Windows (NTLM) authentication, you can add it with `AddNTLMAuthentication`. There are two overrides which you can use.
+
+```csharp
+SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
+    options =>
+    {
+        options.AddNTLMAuthentication("myuser", "mypassword");
+    ....
+
+//or use default security context (logged in user)
+
+SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
+    options =>
+    {
+        options.AddNTLMAuthentication();
+    ...
+```
+
+#### 3. AddRequestFilters
 Filters comprise of different types. Those are `AuthenticationTypes`, `TestTypes` and `EndpointNameWhitelist`. All are optional.
 
-##### 2.1. AuthenticationTypes
+##### 3.1. AuthenticationTypes
 Here we specify a list of Authentication types, that will be filtered out from the whole swagger file. This is where QA Tool Kit presents a convention.
 The built-in types are:
 - `AuthenticationType.Customer` which specifies a string `"@customer"`,
@@ -81,7 +100,7 @@ This is an example from swagger.json excerpt:
 
 Parser then finds those string in the description field and populates the `RequestFilter` property.
 
-##### 2.2 TestTypes
+##### 3.2 TestTypes
 Similarly as in the `AuthenticationTypes` you can filter out certain endpoints to be used in different test scenarios. Currently library supports:
 
 - TestType.LoadTest which specifies a string `"@loadtest"`,
@@ -103,13 +122,13 @@ The same swagger.json excerpt which support test type tags might look like this:
 
 If you feed the list of `HttpRequest` objects with load type tags to the library like `QAToolKit.Engine.Bombardier`, only those requests will be tested.
 
-##### 2.3 EndpointNameWhitelist
+##### 3.3 EndpointNameWhitelist
 Final `RequestFilter` option is `EndpointNameWhitelist`. You can specify a list of endpoints that will be included in the results.
 
 Every other endpoint will be excluded from the results. In the sample above we have set the result to include only `GetCategories` endpoint. 
 That corresponds to the `operationId` in the swagger file above.
 
-#### 3. AddBaseUrl
+#### 4. AddBaseUrl
 Your swagger file has a `Server section`, where you can specify an server URI and can be absolute or relative. An example of relative server section is:
 ```json
 "servers": [
@@ -120,7 +139,7 @@ Your swagger file has a `Server section`, where you can specify an server URI an
 ```
 In case of relative paths you need to add an absolute base URL to `Swagger Processor` with `AddBaseUrl`, otherwise the one from the `Servers section` will be used.
 
-#### 4. UseSwaggerExampleValues
+#### 5. UseSwaggerExampleValues
 You can set `UseSwaggerExampleValues = true` in the SwaggerOptions when creating new Swagger source object. This will
 check Swagger for example files and populate those.
 

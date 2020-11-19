@@ -28,8 +28,43 @@ namespace QAToolKit.Source.Swagger.Test
             Assert.Equal("user", options.UserName);
             Assert.Equal("password", options.Password);
             Assert.True(options.UseBasicAuth);
+            Assert.False(options.UseNTLMAuth);
         }
 
+        [Fact]
+        public void SwaggerNTLMAuthTest_Successful()
+        {
+            var options = new SwaggerOptions();
+            options.AddNTLMAuthentication("user", "password");
+
+            Assert.Equal("user", options.UserName);
+            Assert.Equal("password", options.Password);
+            Assert.False(options.UseBasicAuth);
+            Assert.True(options.UseNTLMAuth);
+        }
+
+        [Theory]
+        [InlineData("","")]
+        [InlineData(null, null)]
+        [InlineData(null, "test")]
+        [InlineData("test", null)]
+        public void SwaggerNTLMAuthTest_Fails(string userName, string password)
+        {
+            var options = new SwaggerOptions();
+            Assert.Throws<ArgumentNullException>(() => options.AddNTLMAuthentication(userName, password));
+        }
+
+        [Fact]
+        public void SwaggerNTLMAuthWithDefaultUserTest_Successful()
+        {
+            var options = new SwaggerOptions();
+            options.AddNTLMAuthentication();
+
+            Assert.Null(options.UserName);
+            Assert.Null( options.Password);
+            Assert.False(options.UseBasicAuth);
+            Assert.True(options.UseNTLMAuth);
+        }
 
         [Fact]
         public void SwaggerAuthenticationTypeRequestFiltersTest_Successful()

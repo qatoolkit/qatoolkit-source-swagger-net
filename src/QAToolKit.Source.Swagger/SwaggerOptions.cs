@@ -19,6 +19,10 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal bool UseBasicAuth { get; private set; } = false;
         /// <summary>
+        /// Is Swagger protected with NTLM authentication?
+        /// </summary>
+        internal bool UseNTLMAuth { get; private set; } = false;
+        /// <summary>
         /// Use request filters?
         /// </summary>
         internal bool UseRequestFilter { get; private set; } = false;
@@ -38,6 +42,10 @@ namespace QAToolKit.Source.Swagger
         /// Use Swagger example values that come with Swagger file
         /// </summary>
         public bool UseSwaggerExampleValues { get; set; } = false;
+        /// <summary>
+        /// Disable SSL validation when accessing swagger.json file
+        /// </summary>
+        public bool DisableSSLValidation { get; set; } = false;
 
         /// <summary>
         /// Add basic authentication
@@ -48,13 +56,47 @@ namespace QAToolKit.Source.Swagger
         public SwaggerOptions AddBasicAuthentication(string userName, string password)
         {
             if (string.IsNullOrEmpty(userName))
-                throw new ArgumentException(nameof(userName));
+                throw new ArgumentNullException($"{nameof(userName)} is null.");
             if (string.IsNullOrEmpty(password))
-                throw new ArgumentException(nameof(password));
+                throw new ArgumentNullException($"{nameof(password)} is null.");
 
             UseBasicAuth = true;
+            UseNTLMAuth = false;
             UserName = userName;
             Password = password;
+            return this;
+        }
+
+        /// <summary>
+        /// Add NTLM authentication
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public SwaggerOptions AddNTLMAuthentication(string userName, string password)
+        {
+            if (string.IsNullOrEmpty(userName))
+                throw new ArgumentNullException($"{nameof(userName)} is null.");
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException($"{nameof(password)} is null.");
+
+            UseBasicAuth = false;
+            UseNTLMAuth = true;
+            UserName = userName;
+            Password = password;
+            return this;
+        }
+
+        /// <summary>
+        /// Add Default NTLM authentication which represents the authentication credentials for the current security context in which the application is running.
+        /// </summary>
+        /// <returns></returns>
+        public SwaggerOptions AddNTLMAuthentication()
+        {
+            UseBasicAuth = false;
+            UseNTLMAuth = true;
+            UserName = null;
+            Password = null;
             return this;
         }
 
@@ -66,7 +108,7 @@ namespace QAToolKit.Source.Swagger
         public SwaggerOptions AddRequestFilters(RequestFilter requestFilter)
         {
             UseRequestFilter = true;
-            RequestFilter = requestFilter ?? throw new ArgumentException(nameof(requestFilter));
+            RequestFilter = requestFilter ?? throw new ArgumentNullException($"{nameof(requestFilter)} is null.");
             return this;
         }
 
@@ -77,7 +119,7 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public SwaggerOptions AddBaseUrl(Uri baseUrl)
         {
-            BaseUrl = baseUrl ?? throw new ArgumentException(nameof(baseUrl));
+            BaseUrl = baseUrl ?? throw new ArgumentNullException($"{nameof(baseUrl)} is null.");
             return this;
         }
     }
