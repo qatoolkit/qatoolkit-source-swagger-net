@@ -1,8 +1,8 @@
 # QAToolKit.Source.Swagger
-![https://github.com/qatoolkit/qatoolkit-source-swagger-net/actions](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)
-![https://github.com/qatoolkit/qatoolkit-source-swagger-net/security/code-scanning](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/CodeQL%20Analyze/badge.svg)
-![https://sonarcloud.io/dashboard?id=qatoolkit_qatoolkit-source-swagger-net](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/Sonarqube%20Analyze/badge.svg)
-![https://www.nuget.org/packages/QAToolKit.Source.Swagger/](https://img.shields.io/nuget/v/QAToolKit.Source.Swagger?label=QAToolKit.Source.Swagger)
+[![Build .NET Library](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/.NET%20Core/badge.svg)](https://github.com/qatoolkit/qatoolkit-source-swagger-net/actions)
+[![CodeQL](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/CodeQL%20Analyze/badge.svg)](https://github.com/qatoolkit/qatoolkit-source-swagger-net/security/code-scanning)
+[![Sonarcloud Quality gate](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/Sonarqube%20Analyze/badge.svg)](https://sonarcloud.io/dashboard?id=qatoolkit_qatoolkit-source-swagger-net)
+[![NuGet package](https://img.shields.io/nuget/v/QAToolKit.Source.Swagger?label=QAToolKit.Source.Swagger)](https://www.nuget.org/packages/QAToolKit.Source.Swagger/)
 
 ## Description
 `QAToolKit.Source.Swagger` is a .NET library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
