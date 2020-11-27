@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -87,7 +88,44 @@ namespace QAToolKit.Source.Swagger.Test
 
             _logger.LogInformation(JsonConvert.SerializeObject(requests));
 
+            Assert.Equal("https://petstore3.swagger.io/api/support/v2", requests.FirstOrDefault().BasePath);
+            Assert.Equal(HttpMethod.Get, requests.FirstOrDefault().Method);
+            Assert.Equal("getSupportTicketCasesList", requests.FirstOrDefault().OperationId);
+            Assert.Empty(requests.FirstOrDefault().RequestBodies);
+            Assert.Equal(4, requests.FirstOrDefault().Responses.Count);
+            Assert.Equal(2, requests.FirstOrDefault().Parameters.Count);
+            Assert.Null(requests.FirstOrDefault().Parameters.FirstOrDefault(p => p.Name == "Area").Value);
             Assert.Single(requests);
         }
+
+        [Fact]
+        public async void SwaggerFileSourceYamlWithWhitelistAndExampleTest_Fails()
+        {
+            var fileSource = new SwaggerFileSource(options =>
+            {
+                options.AddBaseUrl(new Uri("http://localhost/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    EndpointNameWhitelist = new string[] { "getSupportTicketsList" }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await fileSource.Load(new List<FileInfo>() {
+                new FileInfo("Assets/support-tickets.yaml")
+            });
+
+            _logger.LogInformation(JsonConvert.SerializeObject(requests));
+
+            Assert.Equal("http://localhost/api/support/v2", requests.FirstOrDefault().BasePath);
+            Assert.Equal(HttpMethod.Get, requests.FirstOrDefault().Method);
+            Assert.Equal("getSupportTicketsList", requests.FirstOrDefault().OperationId);
+            Assert.Empty(requests.FirstOrDefault().RequestBodies);
+            Assert.Equal(4, requests.FirstOrDefault().Responses.Count);
+            Assert.Equal(2, requests.FirstOrDefault().Parameters.Count);
+            Assert.Equal("Company", requests.FirstOrDefault().Parameters.FirstOrDefault(p => p.Name == "Area").Value);
+            Assert.Single(requests);
+        }
+
     }
 }
