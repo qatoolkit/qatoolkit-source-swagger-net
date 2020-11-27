@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace QAToolKit.Source.Swagger
 {
     /// <summary>
-    /// Swagger Url source
+    /// Load Swagger from url source
     /// </summary>
     public class SwaggerUrlSource : ITestSource<Uri[], IEnumerable<HttpRequest>>
     {
@@ -92,7 +92,17 @@ namespace QAToolKit.Source.Swagger
                         var textWritter = new OpenApiJsonWriter(new StringWriter());
                         openApiDocument.SerializeAsV3(textWritter);
 
-                        var requests = processor.MapFromOpenApiDocument(new Uri($"{uri.Scheme}://{uri.Host}"), openApiDocument);
+                        Uri url;
+                        if (_swaggerOptions.BaseUrl != null)
+                        {
+                            url = _swaggerOptions.BaseUrl;
+                        }
+                        else
+                        {
+                            url = new Uri($"{uri.Scheme}://{uri.Host}");
+                        }
+
+                        var requests = processor.MapFromOpenApiDocument(url, openApiDocument);
 
                         restRequests.AddRange(requests);
                     }
