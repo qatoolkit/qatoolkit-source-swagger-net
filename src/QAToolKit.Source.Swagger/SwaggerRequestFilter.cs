@@ -6,7 +6,7 @@ using System.Linq;
 namespace QAToolKit.Source.Swagger
 {
     /// <summary>
-    /// Swagger request filtering
+    /// Swagger request filtering by OperationId, TestType or AuthenticationType
     /// </summary>
     public class SwaggerRequestFilter
     {

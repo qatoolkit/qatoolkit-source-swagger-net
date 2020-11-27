@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace QAToolKit.Source.Swagger
 {
     /// <summary>
-    /// Swagger options
+    /// Swagger processor options
     /// </summary>
     public class SwaggerOptions
     {
@@ -15,15 +15,15 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal RequestFilter RequestFilter { get; private set; }
         /// <summary>
-        /// Is Swagger protected with Basic authentication?
+        /// Is Swagger protected with Basic authentication
         /// </summary>
         internal bool UseBasicAuth { get; private set; } = false;
         /// <summary>
-        /// Is Swagger protected with NTLM authentication?
+        /// Is Swagger protected with NTLM authentication
         /// </summary>
         internal bool UseNTLMAuth { get; private set; } = false;
         /// <summary>
-        /// Use request filters?
+        /// Use request filters, to process only selected endpoints.
         /// </summary>
         internal bool UseRequestFilter { get; private set; } = false;
         /// <summary>
@@ -35,20 +35,20 @@ namespace QAToolKit.Source.Swagger
         /// </summary>
         internal string Password { get; private set; }
         /// <summary>
-        /// Set custom base API URL
+        /// Set custom base API URL to the resulting HttpRequest list.
         /// </summary>
         internal Uri BaseUrl { get; private set; }
         /// <summary>
-        /// Use Swagger example values that come with Swagger file
+        /// Use Swagger example values that come with Swagger file. Default us 'false'.
         /// </summary>
         public bool UseSwaggerExampleValues { get; set; } = false;
         /// <summary>
-        /// Disable SSL validation when accessing swagger.json file
+        /// Disable SSL validation when accessing swagger.json file. Default is 'false'.
         /// </summary>
         public bool DisableSSLValidation { get; set; } = false;
 
         /// <summary>
-        /// Add basic authentication
+        /// Add basic authentication to access swagger.json file.
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
@@ -68,7 +68,7 @@ namespace QAToolKit.Source.Swagger
         }
 
         /// <summary>
-        /// Add NTLM authentication
+        /// Add NTLM authentication to access swagger.json file. Normally used when swagger is hosted in IIS.
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
@@ -101,7 +101,7 @@ namespace QAToolKit.Source.Swagger
         }
 
         /// <summary>
-        /// Use request filters
+        /// Use request filters, to process only selected endpoints.
         /// </summary>
         /// <param name="requestFilter"></param>
         /// <returns></returns>
@@ -113,7 +113,7 @@ namespace QAToolKit.Source.Swagger
         }
 
         /// <summary>
-        /// Add base url
+        /// Add base url, which will override swagger.json URL in the 'HttpRequest' list
         /// </summary>
         /// <param name="baseUrl"></param>
         /// <returns></returns>
