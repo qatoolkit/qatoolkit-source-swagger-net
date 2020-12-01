@@ -102,55 +102,55 @@ namespace QAToolKit.Source.Swagger
             return requests;
         }
 
-        private List<TestType> GetTestTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
+        private List<TestType.Enumeration> GetTestTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
-            var testType = new List<TestType>();
+            var testType = new List<TestType.Enumeration>();
 
             if (operation.Value.Description.Contains(TestType.IntegrationTest.Value()))
             {
-                testType.Add(TestType.IntegrationTest);
+                testType.Add(TestType.Enumeration.IntegrationTest);
             }
 
             if (operation.Value.Description.Contains(TestType.LoadTest.Value()))
             {
-                testType.Add(TestType.LoadTest);
+                testType.Add(TestType.Enumeration.LoadTest);
             }
 
             if (operation.Value.Description.Contains(TestType.SecurityTest.Value()))
             {
-                testType.Add(TestType.SecurityTest);
+                testType.Add(TestType.Enumeration.SecurityTest);
             }
 
             if (operation.Value.Description.Contains(TestType.SqlTest.Value()))
             {
-                testType.Add(TestType.SqlTest);
+                testType.Add(TestType.Enumeration.SqlTest);
             }
 
             return testType;
         }
 
-        private List<AuthenticationType> GetAuthenticationTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
+        private List<AuthenticationType.Enumeration> GetAuthenticationTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
-            var authenticationTypes = new List<AuthenticationType>();
+            var authenticationTypes = new List<AuthenticationType.Enumeration>();
 
             if (operation.Value.Description.Contains(AuthenticationType.Administrator.Value()))
             {
-                authenticationTypes.Add(AuthenticationType.Administrator);
+                authenticationTypes.Add(AuthenticationType.Enumeration.Administrator);
             }
 
             if (operation.Value.Description.Contains(AuthenticationType.Customer.Value()))
             {
-                authenticationTypes.Add(AuthenticationType.Customer);
+                authenticationTypes.Add(AuthenticationType.Enumeration.Customer);
             }
 
             if (operation.Value.Description.Contains(AuthenticationType.ApiKey.Value()))
             {
-                authenticationTypes.Add(AuthenticationType.ApiKey);
+                authenticationTypes.Add(AuthenticationType.Enumeration.ApiKey);
             }
 
-            if (operation.Value.Description.Contains(AuthenticationType.Oauth2.Value()))
+            if (operation.Value.Description.Contains(AuthenticationType.OAuth2.Value()))
             {
-                authenticationTypes.Add(AuthenticationType.Oauth2);
+                authenticationTypes.Add(AuthenticationType.Enumeration.OAuth2);
             }
 
             return authenticationTypes;
