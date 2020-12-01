@@ -16,6 +16,17 @@ Major features:
 - access swagger.json from URL, which is protected by `basic authentication`,
 - control which swagger endpoints are returned by specifying `request filters` (check below)
 
+## Video material
+
+1. Introduction to Swagger Library
+
+[![Swagger Library part 1](https://i9.ytimg.com/vi/EhQQMNZbwVY/mq2.jpg?sqp=CIirif4F&rs=AOn4CLCVs7LUGLQ63wZWNnLb8XAr3CShtA)](https://youtu.be/EhQQMNZbwVY "Swagger Library part 1")
+
+2. Swagger RequestFilter explained
+
+
+3. Generate a CSV report
+
 ## Sample
 
 This is a sample of instantiating a new Swagger Source object from URL.
@@ -28,8 +39,8 @@ SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
         options.AddBasicAuthentication("myuser", "mypassword");
         options.AddRequestFilters(new RequestFilter()
         {
-            AuthenticationTypes = new List<AuthenticationType>() { AuthenticationType.Customer },
-            TestTypes = new List<TestType>() { TestType.LoadTest },
+            AuthenticationTypes = new List<AuthenticationType.Enumeration>() { AuthenticationType.Enumeration.Customer },
+            TestTypes = new List<TestType.Enumeration>() { TestType.Enumeration.LoadTest },
             EndpointNameWhitelist = new string[] { "GetCategories" }
         });
         options.AddBaseUrl(new Uri("https://dev.myapi.com"));
@@ -105,7 +116,7 @@ Similarly as in the `AuthenticationTypes` you can filter out certain endpoints t
 
 - TestType.LoadTest which specifies a string `"@loadtest"`,
 - TestType.IntegrationTest which specifies a string `"@integrationtest"`,
-- TestType.SecurityTest which specifies a string `"@securitytest"`,
+- TestType.SecurityTest which specifies a string `"@securitytest"`
 
 The same swagger.json excerpt which support test type tags might look like this:
 

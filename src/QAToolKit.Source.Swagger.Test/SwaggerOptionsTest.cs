@@ -72,13 +72,13 @@ namespace QAToolKit.Source.Swagger.Test
             var options = new SwaggerOptions();
             options.AddRequestFilters(new RequestFilter()
             {
-                AuthenticationTypes = new List<AuthenticationType>() { AuthenticationType.Administrator, AuthenticationType.Basic }
+                AuthenticationTypes = new List<AuthenticationType.Enumeration>() { AuthenticationType.Enumeration.Administrator, AuthenticationType.Enumeration.Basic }
             });
 
-            Assert.NotNull(options.RequestFilter.AuthenticationTypes.FirstOrDefault(i => i == AuthenticationType.Administrator));
-            Assert.Null(options.RequestFilter.AuthenticationTypes.FirstOrDefault(i => i == AuthenticationType.Customer));
-            Assert.Null(options.RequestFilter.AuthenticationTypes.FirstOrDefault(i => i == AuthenticationType.ApiKey));
-            Assert.NotNull(options.RequestFilter.AuthenticationTypes.FirstOrDefault(i => i == AuthenticationType.Basic));
+            Assert.Contains(AuthenticationType.Enumeration.Administrator, options.RequestFilter.AuthenticationTypes);
+            Assert.DoesNotContain(AuthenticationType.Enumeration.Customer, options.RequestFilter.AuthenticationTypes);
+            Assert.DoesNotContain(AuthenticationType.Enumeration.ApiKey, options.RequestFilter.AuthenticationTypes);
+            Assert.Contains(AuthenticationType.Enumeration.Basic, options.RequestFilter.AuthenticationTypes);
             Assert.True(options.UseRequestFilter);
         }
 
@@ -101,13 +101,13 @@ namespace QAToolKit.Source.Swagger.Test
             var options = new SwaggerOptions();
             options.AddRequestFilters(new RequestFilter()
             {
-                TestTypes = new List<TestType>() { TestType.LoadTest }
+                TestTypes = new List<TestType.Enumeration>() { TestType.Enumeration.LoadTest }
             });
 
-            Assert.NotNull(options.RequestFilter.TestTypes.FirstOrDefault(i => i == TestType.LoadTest));
-            Assert.Null(options.RequestFilter.TestTypes.FirstOrDefault(i => i == TestType.IntegrationTest));
-            Assert.Null(options.RequestFilter.TestTypes.FirstOrDefault(i => i == TestType.SecurityTest));
-            Assert.Null(options.RequestFilter.TestTypes.FirstOrDefault(i => i == TestType.SqlTest));
+            Assert.Contains(TestType.Enumeration.LoadTest, options.RequestFilter.TestTypes);
+            Assert.DoesNotContain(TestType.Enumeration.IntegrationTest, options.RequestFilter.TestTypes);
+            Assert.DoesNotContain(TestType.Enumeration.SecurityTest, options.RequestFilter.TestTypes);
+            Assert.DoesNotContain(TestType.Enumeration.SqlTest, options.RequestFilter.TestTypes);
             Assert.True(options.UseRequestFilter);
         }
 
