@@ -27,21 +27,21 @@ namespace QAToolKit.Source.Swagger
         /// <returns></returns>
         public IEnumerable<HttpRequest> FilterRequests(RequestFilter requestFilter)
         {
-            var requestsLocal = new List<HttpRequest>();
+            IQueryable<HttpRequest> requestsLocal = _requests.AsQueryable();
 
             if (requestFilter.AuthenticationTypes != null)
             {
-                requestsLocal.AddRange(_requests.Where(request => requestFilter.AuthenticationTypes.Any(x => request.AuthenticationTypes.Contains(x))));
+                requestsLocal = requestsLocal.Where(request => requestFilter.AuthenticationTypes.Any(x => request.AuthenticationTypes.Contains(x)));
             }
 
             if (requestFilter.TestTypes != null)
             {
-                requestsLocal.AddRange(_requests.Where(request => requestFilter.TestTypes.Any(x => request.TestTypes.Contains(x))));
+                requestsLocal = requestsLocal.Where(request => requestFilter.TestTypes.Any(x => request.TestTypes.Contains(x)));
             }
 
             if (requestFilter.EndpointNameWhitelist != null)
             {
-                requestsLocal.AddRange(_requests.Where(request => requestFilter.EndpointNameWhitelist.Any(x => x == request.OperationId)));
+                requestsLocal = requestsLocal.Where(request => requestFilter.EndpointNameWhitelist.Any(x => x == request.OperationId));
             }
 
             return requestsLocal.ToList();
