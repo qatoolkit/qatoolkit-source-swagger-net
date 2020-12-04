@@ -181,5 +181,134 @@ namespace QAToolKit.Source.Swagger.Test
 
             Assert.Equal(2, requests.Count());
         }
+
+        [Fact]
+        public async Task SwaggerRequestFilterOperationIdAndAuthTypeAndTestTypeAlternativeWithMethodTest_Success()
+        {
+            var urlSource = new SwaggerUrlSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://qatoolkitapi.azurewebsites.net/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    TestTypes = new List<TestType.Enumeration> { TestType.Enumeration.LoadTest },
+                    EndpointNameWhitelist = new string[] { "DeleteBike", "UpdateBike" },
+                    AuthenticationTypes = new List<AuthenticationType.Enumeration> { AuthenticationType.Enumeration.ApiKey },
+                    HttpMethodsWhitelist = new List<HttpMethod>() { HttpMethod.Put, HttpMethod.Delete }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await urlSource.Load(new Uri[] {
+                new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
+            });
+
+            Assert.Equal(2, requests.Count());
+        }
+
+        [Fact]
+        public async Task SwaggerRequestFilterTestTypeAlternativeWithMethodTestV2_Success()
+        {
+            var urlSource = new SwaggerUrlSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://qatoolkitapi.azurewebsites.net/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    TestTypes = new List<TestType.Enumeration> { TestType.Enumeration.LoadTest },
+                    HttpMethodsWhitelist = new List<HttpMethod>() { HttpMethod.Put, HttpMethod.Post, HttpMethod.Get }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await urlSource.Load(new Uri[] {
+                new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
+            });
+
+            Assert.Equal(4, requests.Count());
+        }
+
+        [Fact]
+        public async Task SwaggerRequestFilterTestTypeAlternativeWithGeneralContainsTest_Success()
+        {
+            var urlSource = new SwaggerUrlSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://qatoolkitapi.azurewebsites.net/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    TestTypes = new List<TestType.Enumeration> { TestType.Enumeration.LoadTest },
+                    HttpMethodsWhitelist = new List<HttpMethod>() { HttpMethod.Put, HttpMethod.Post, HttpMethod.Get },
+                    GeneralContains = new string[] { "new bicycle" }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await urlSource.Load(new Uri[] {
+                new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
+            });
+
+            Assert.Single(requests);
+        }
+
+        [Fact]
+        public async Task SwaggerRequestFilterAuthTypeAndTestTypeAlternativeWithGeneralContainsTestV2_Success()
+        {
+            var urlSource = new SwaggerUrlSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://qatoolkitapi.azurewebsites.net/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    TestTypes = new List<TestType.Enumeration> { TestType.Enumeration.LoadTest },
+                    HttpMethodsWhitelist = new List<HttpMethod>() { HttpMethod.Put, HttpMethod.Post, HttpMethod.Get },
+                    GeneralContains = new string[] { "bicycle" }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await urlSource.Load(new Uri[] {
+                new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
+            });
+
+            Assert.Equal(3, requests.Count());
+        }
+
+        [Fact]
+        public async Task SwaggerRequestFilterTestTypeAlternativeWithGeneralContainsTagTest_Success()
+        {
+            var urlSource = new SwaggerUrlSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://qatoolkitapi.azurewebsites.net/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    TestTypes = new List<TestType.Enumeration> { TestType.Enumeration.LoadTest },
+                    GeneralContains = new string[] { "PUBLIC" }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await urlSource.Load(new Uri[] {
+                new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
+            });
+
+            Assert.Equal(5, requests.Count());
+        }
+
+        [Fact]
+        public async Task SwaggerRequestFilterGeneralContainsTagTest_Success()
+        {
+            var urlSource = new SwaggerUrlSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://qatoolkitapi.azurewebsites.net/"));
+                options.AddRequestFilters(new RequestFilter()
+                {
+                    GeneralContains = new string[] { "PUBLIC" }
+                });
+                options.UseSwaggerExampleValues = true;
+            });
+
+            var requests = await urlSource.Load(new Uri[] {
+                new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v1/swagger.json")
+            });
+
+            Assert.Equal(5, requests.Count());
+        }
     }
 }

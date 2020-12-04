@@ -41,7 +41,9 @@ SwaggerUrlSource swaggerSource = new SwaggerUrlSource(
         {
             AuthenticationTypes = new List<AuthenticationType.Enumeration>() { AuthenticationType.Enumeration.Customer },
             TestTypes = new List<TestType.Enumeration>() { TestType.Enumeration.LoadTest },
-            EndpointNameWhitelist = new string[] { "GetCategories" }
+            EndpointNameWhitelist = new string[] { "GetCategories" },
+            HttpMethodsWhitelist = new List<HttpMethod>() { HttpMethod.Put, HttpMethod.Post, HttpMethod.Get },
+            GeneralContains = new string[] { "bicycle" }
         });
         options.AddBaseUrl(new Uri("https://dev.myapi.com"));
         options.UseSwaggerExampleValues = true;
@@ -134,10 +136,20 @@ The same swagger.json excerpt which support test type tags might look like this:
 If you feed the list of `HttpRequest` objects with load type tags to the library like `QAToolKit.Engine.Bombardier`, only those requests will be tested.
 
 ##### 3.3 EndpointNameWhitelist
-Final `RequestFilter` option is `EndpointNameWhitelist`. You can specify a list of endpoints that will be included in the results.
+Another `RequestFilter` option is `EndpointNameWhitelist`. You can specify a list of endpoints that will be included in the results.
 
 Every other endpoint will be excluded from the results. In the sample above we have set the result to include only `GetCategories` endpoint. 
 That corresponds to the `operationId` in the swagger file above.
+
+##### 3.4 HttpMethodsWhitelist
+`HttpMethodsWhitelist` is a list of HTTP Methods that will be used in the `RequestFilter`.
+
+Every other endpoint, that does not have a HTTP method that is in the `HttpMethodsWhitelist` will be excluded from the results.
+
+##### 3.5 GeneralContains
+Final `RequestFilter` option is `GeneralContains`, which is an array of strings.
+
+Every other endpoint, that does not contain an array from the list will be excluded from the results. Every string in the array is compared with Swagger `Description`, `Summary` or `Tags` and is case insensitive.
 
 #### 4. AddBaseUrl
 Your swagger file has a `Server section`, where you can specify an server URI and can be absolute or relative. An example of relative server section is:
