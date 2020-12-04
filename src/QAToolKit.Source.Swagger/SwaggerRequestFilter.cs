@@ -44,6 +44,19 @@ namespace QAToolKit.Source.Swagger
                 requestsLocal = requestsLocal.Where(request => requestFilter.EndpointNameWhitelist.Any(x => x == request.OperationId));
             }
 
+            if (requestFilter.HttpMethodsWhitelist != null)
+            {
+                requestsLocal = requestsLocal.Where(request => requestFilter.HttpMethodsWhitelist.Any(x => x == request.Method));
+            }
+
+            if (requestFilter.GeneralContains != null)
+            {
+                requestsLocal = requestsLocal.Where(request => requestFilter.GeneralContains.Any(x =>
+                                                    (request.Summary != null && request.Summary.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                                                    (request.Description != null && request.Description.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                                                    (request.Tags != null && request.Tags.Contains(x, StringComparer.InvariantCultureIgnoreCase))));
+            }
+
             return requestsLocal.ToList();
         }
     }
