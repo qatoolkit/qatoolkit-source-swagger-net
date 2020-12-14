@@ -52,7 +52,7 @@ namespace QAToolKit.Source.Swagger.Test
                 new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
             });
 
-            Assert.Equal(3, requests.Count());
+            Assert.Equal(5, requests.Count());
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace QAToolKit.Source.Swagger.Test
                 new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
             });
 
-            Assert.Equal(5, requests.Count());
+            Assert.Equal(7, requests.Count());
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace QAToolKit.Source.Swagger.Test
                 new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
             });
 
-            Assert.Equal(3, requests.Count());
+            Assert.Equal(5, requests.Count());
         }
 
         [Fact]
@@ -223,7 +223,7 @@ namespace QAToolKit.Source.Swagger.Test
                 new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
             });
 
-            Assert.Equal(4, requests.Count());
+            Assert.Equal(6, requests.Count());
         }
 
         [Fact]
@@ -267,7 +267,7 @@ namespace QAToolKit.Source.Swagger.Test
                 new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
             });
 
-            Assert.Equal(3, requests.Count());
+            Assert.Equal(5, requests.Count());
         }
 
         [Fact]
@@ -288,7 +288,7 @@ namespace QAToolKit.Source.Swagger.Test
                 new Uri("https://qatoolkitapi.azurewebsites.net/swagger/v2/swagger.json")
             });
 
-            Assert.Equal(5, requests.Count());
+            Assert.Equal(7, requests.Count());
         }
 
         [Fact]
