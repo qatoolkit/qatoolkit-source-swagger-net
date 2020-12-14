@@ -3,6 +3,7 @@
 [![CodeQL](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/CodeQL%20Analyze/badge.svg)](https://github.com/qatoolkit/qatoolkit-source-swagger-net/security/code-scanning)
 [![Sonarcloud Quality gate](https://github.com/qatoolkit/qatoolkit-source-swagger-net/workflows/Sonarqube%20Analyze/badge.svg)](https://sonarcloud.io/dashboard?id=qatoolkit_qatoolkit-source-swagger-net)
 [![NuGet package](https://img.shields.io/nuget/v/QAToolKit.Source.Swagger?label=QAToolKit.Source.Swagger)](https://www.nuget.org/packages/QAToolKit.Source.Swagger/)
+[![Discord](https://img.shields.io/discord/787220825127780354?color=%23267CB9&label=Discord%20chat)](https://discord.com/invite/tu3WDV5Z?utm_source=Discord%20Widget&utm_medium=Connect)
 
 ## Description
 `QAToolKit.Source.Swagger` is a .NET library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
@@ -16,16 +17,19 @@ Major features:
 - access swagger.json from URL, which is protected by `basic authentication`,
 - control which swagger endpoints are returned by specifying `request filters` (check below)
 
+Get in touch with me on:
+
+[![Discord](https://img.shields.io/discord/787220825127780354?color=%23267CB9&label=Discord%20chat)](https://discord.com/invite/tu3WDV5Z?utm_source=Discord%20Widget&utm_medium=Connect)
+
 ## Video material
 
 1. Introduction to Swagger Library
 
-[![Swagger Library part 1](https://i9.ytimg.com/vi/EhQQMNZbwVY/mq2.jpg?sqp=CIirif4F&rs=AOn4CLCVs7LUGLQ63wZWNnLb8XAr3CShtA)](https://youtu.be/EhQQMNZbwVY "Swagger Library part 1")
+[![Start with Swagger Library](https://i9.ytimg.com/vi/EhQQMNZbwVY/maxresdefault.jpg?time=1607952000000&sqp=CIDN3f4F&rs=AOn4CLDcqo7vQ9jLTzLgCj2YdrPFPdVqZQ)](https://www.youtube.com/watch?v=EhQQMNZbwVY "Start with Swagger Library")
 
-2. Swagger RequestFilter explained
+2. Swagger library request filters explained
 
-
-3. Generate a CSV report
+[![Swagger library request filters](https://i9.ytimg.com/vi/-1hBRJLZcjY/maxresdefault.jpg?time=1607952000000&sqp=CIDN3f4F&rs=AOn4CLCJYrFjyO44DFjlTY1v6MlGe_hJRw)](https://www.youtube.com/watch?v=-1hBRJLZcjY "Swagger library request filters")
 
 ## Sample
 
