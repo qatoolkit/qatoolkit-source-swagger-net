@@ -55,7 +55,8 @@ namespace QAToolKit.Source.Swagger
                 {
                     if (baseUri == null)
                     {
-                        throw new QAToolKitSwaggerException("Swagger from file source needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
+                        throw new QAToolKitSwaggerException(
+                            "Swagger from file source needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
                     }
 
                     baseUri = new Uri(baseUri, tempUri);
@@ -110,12 +111,12 @@ namespace QAToolKit.Source.Swagger
             {
                 return testType;
             }
-            
+
             if (operation.Value.Description == null)
             {
                 return testType;
             }
-            
+
             if (operation.Value.Description.Contains(TestType.IntegrationTest.Value()))
             {
                 testType.Add(TestType.Enumeration.IntegrationTest);
@@ -139,7 +140,8 @@ namespace QAToolKit.Source.Swagger
             return testType;
         }
 
-        private List<AuthenticationType.Enumeration> GetAuthenticationTypes(KeyValuePair<OperationType, OpenApiOperation> operation)
+        private List<AuthenticationType.Enumeration> GetAuthenticationTypes(
+            KeyValuePair<OperationType, OpenApiOperation> operation)
         {
             var authenticationTypes = new List<AuthenticationType.Enumeration>();
 
@@ -147,12 +149,12 @@ namespace QAToolKit.Source.Swagger
             {
                 return authenticationTypes;
             }
-            
+
             if (operation.Value.Description == null)
             {
                 return authenticationTypes;
             }
-            
+
             if (operation.Value.Description.Contains(AuthenticationType.Administrator.Value()))
             {
                 authenticationTypes.Add(AuthenticationType.Enumeration.Administrator);
@@ -182,12 +184,12 @@ namespace QAToolKit.Source.Swagger
             {
                 return String.Empty;
             }
-            
+
             if (operation.Value.Description == null)
             {
                 return String.Empty;
             }
-            
+
             return operation.Value.Description;
         }
 
@@ -197,12 +199,12 @@ namespace QAToolKit.Source.Swagger
             {
                 return Array.Empty<string>();
             }
-            
+
             if (operation.Value.Tags == null)
             {
                 return Array.Empty<string>();
             }
-            
+
             return operation.Value.Tags.Select(t => t.Name).ToArray();
         }
 
@@ -261,8 +263,10 @@ namespace QAToolKit.Source.Swagger
                 "403" => HttpStatusCode.Forbidden,
                 "404" => HttpStatusCode.NotFound,
                 "405" => HttpStatusCode.MethodNotAllowed,
+                "406" => HttpStatusCode.NotAcceptable,
                 "409" => HttpStatusCode.Conflict,
                 "500" => HttpStatusCode.InternalServerError,
+                "503" => HttpStatusCode.ServiceUnavailable,
                 "default" => null,
                 _ => throw new QAToolKitSwaggerException($"HttpStatusCode not found '{statusCode}'."),
             };
@@ -372,6 +376,7 @@ namespace QAToolKit.Source.Swagger
             var properties = new List<Property>();
 
             #region Items
+
             Property itemsProperty = null;
 
             if (source.Value.Items != null)
@@ -399,13 +404,16 @@ namespace QAToolKit.Source.Swagger
                         {
                             itemsProperty.Properties = new List<Property>();
                         }
+
                         itemsProperty.Properties.AddRange(recursiveProperties);
                     }
                 }
             }
+
             #endregion
 
             #region enums
+
             Property enumProperty = null;
             if (source.Value.Enum != null && source.Value.Enum.Count > 0)
             {
@@ -436,6 +444,7 @@ namespace QAToolKit.Source.Swagger
                     }
                 }
             }
+
             #endregion
 
             var prop = new Property
@@ -477,6 +486,7 @@ namespace QAToolKit.Source.Swagger
                 {
                     prop.Properties = new List<Property>();
                 }
+
                 prop.Properties.AddRange(propsTem);
             }
 
@@ -531,17 +541,19 @@ namespace QAToolKit.Source.Swagger
         private ResponseType GetResponseType(OpenApiResponse value)
         {
             foreach (var contentType in value.Content.Where(contentType =>
-                  ContentType.From(contentType.Key) == ContentType.Json))
+                ContentType.From(contentType.Key) == ContentType.Json))
             {
                 if (contentType.Value.Schema.Items != null &&
-                    (contentType.Value.Schema.Items.Type == "array" || contentType.Value.Schema.Items.Type != "object") &&
+                    (contentType.Value.Schema.Items.Type == "array" ||
+                     contentType.Value.Schema.Items.Type != "object") &&
                     contentType.Value.Schema.Type == "array")
                 {
                     return ResponseType.Array;
                 }
                 else if (contentType.Value.Schema.Items != null &&
-                    (contentType.Value.Schema.Items.Type == "array" || contentType.Value.Schema.Items.Type == "object") &&
-                    contentType.Value.Schema.Type == "array")
+                         (contentType.Value.Schema.Items.Type == "array" ||
+                          contentType.Value.Schema.Items.Type == "object") &&
+                         contentType.Value.Schema.Type == "array")
                 {
                     return ResponseType.Objects;
                 }
@@ -550,7 +562,7 @@ namespace QAToolKit.Source.Swagger
                     return ResponseType.Object;
                 }
                 else if (contentType.Value.Schema.Items == null &&
-                        (contentType.Value.Schema.Type != "object" || contentType.Value.Schema.Type != "array"))
+                         (contentType.Value.Schema.Type != "object" || contentType.Value.Schema.Type != "array"))
                 {
                     return ResponseType.Primitive;
                 }
@@ -579,7 +591,7 @@ namespace QAToolKit.Source.Swagger
 
             //TODO: support other content types
             foreach (var contentType in openApiResponse.Content.Where(contentType =>
-            ContentType.From(contentType.Key) == ContentType.Json))
+                ContentType.From(contentType.Key) == ContentType.Json))
             {
                 if (contentType.Value.Schema.Properties != null && contentType.Value.Schema.Properties.Count > 0)
                 {
