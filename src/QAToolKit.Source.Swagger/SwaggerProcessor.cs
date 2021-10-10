@@ -106,6 +106,16 @@ namespace QAToolKit.Source.Swagger
         {
             var testType = new List<TestType.Enumeration>();
 
+            if (operation.Value == null)
+            {
+                return testType;
+            }
+            
+            if (operation.Value.Description == null)
+            {
+                return testType;
+            }
+            
             if (operation.Value.Description.Contains(TestType.IntegrationTest.Value()))
             {
                 testType.Add(TestType.Enumeration.IntegrationTest);
@@ -133,6 +143,16 @@ namespace QAToolKit.Source.Swagger
         {
             var authenticationTypes = new List<AuthenticationType.Enumeration>();
 
+            if (operation.Value == null)
+            {
+                return authenticationTypes;
+            }
+            
+            if (operation.Value.Description == null)
+            {
+                return authenticationTypes;
+            }
+            
             if (operation.Value.Description.Contains(AuthenticationType.Administrator.Value()))
             {
                 authenticationTypes.Add(AuthenticationType.Enumeration.Administrator);
@@ -158,11 +178,31 @@ namespace QAToolKit.Source.Swagger
 
         private string GetDescription(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
+            if (operation.Value == null)
+            {
+                return String.Empty;
+            }
+            
+            if (operation.Value.Description == null)
+            {
+                return String.Empty;
+            }
+            
             return operation.Value.Description;
         }
 
         private string[] GetTags(KeyValuePair<OperationType, OpenApiOperation> operation)
         {
+            if (operation.Value == null)
+            {
+                return Array.Empty<string>();
+            }
+            
+            if (operation.Value.Tags == null)
+            {
+                return Array.Empty<string>();
+            }
+            
             return operation.Value.Tags.Select(t => t.Name).ToArray();
         }
 
