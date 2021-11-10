@@ -1,6 +1,4 @@
-﻿using Microsoft.OpenApi.Readers;
-using Microsoft.OpenApi.Writers;
-using QAToolKit.Core.Interfaces;
+﻿using QAToolKit.Core.Interfaces;
 using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -28,7 +26,7 @@ namespace QAToolKit.Source.Swagger
         }
 
         /// <summary>
-        /// Load swagger file sources from storage
+        /// Load swagger file sources from a files on a disk
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
@@ -41,12 +39,9 @@ namespace QAToolKit.Source.Swagger
 
             foreach (var filePath in source)
             {
-                using (FileStream SourceStream = File.OpenRead(filePath.FullName))
+                using (var sourceStream = File.OpenRead(filePath.FullName))
                 {
-                    var openApiDocument = new OpenApiStreamReader().Read(SourceStream, out var diagnostic);
-
-                    var textWritter = new OpenApiJsonWriter(new StringWriter());
-                    openApiDocument.SerializeAsV3(textWritter);
+                    var openApiDocument = SwaggerParser.GenerateOpenApiDocument(sourceStream);
 
                     var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument);
 
