@@ -8,7 +8,7 @@
 ## Description
 `QAToolKit.Source.Swagger` is a .NET library, which generates `IEnumerable<HttpRequest>` object that is the input for other components.
 
-Supported .NET frameworks and standards: `netstandard2.0`, `netstandard2.1`, `netcoreapp3.1`, `net5.0`
+Supported .NET frameworks and standards: `netstandard2.0`, `netstandard2.1`, `netcoreapp3.1`, `net6.0`
 
 Major features:
 

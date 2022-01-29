@@ -1,10 +1,7 @@
-﻿using Microsoft.OpenApi.Readers;
-using Microsoft.OpenApi.Writers;
-using QAToolKit.Core.Interfaces;
+﻿using QAToolKit.Core.Interfaces;
 using QAToolKit.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -53,7 +50,7 @@ namespace QAToolKit.Source.Swagger
                 {
                     if (_swaggerOptions.UseNTLMAuth)
                     {
-                        var credentials = new NetworkCredential();
+                        NetworkCredential credentials;
                         if (string.IsNullOrEmpty(_swaggerOptions.UserName) || string.IsNullOrEmpty(_swaggerOptions.Password))
                         {
                             credentials = CredentialCache.DefaultNetworkCredentials;
@@ -71,10 +68,7 @@ namespace QAToolKit.Source.Swagger
                     {
                         handler.ClientCertificateOptions = ClientCertificateOption.Manual;
                         handler.ServerCertificateCustomValidationCallback =
-                        (httpRequestMessage, cert, cetChain, policyErrors) =>
-                        {
-                            return true;
-                        };
+                        (httpRequestMessage, cert, cetChain, policyErrors) => true;
                     }
 
                     using (var httpClient = new HttpClient(handler))
@@ -88,19 +82,9 @@ namespace QAToolKit.Source.Swagger
 
                         var stream = await httpClient.GetStreamAsync(uri);
 
-                        var openApiDocument = new OpenApiStreamReader().Read(stream, out var diagnostic);
-                        var textWritter = new OpenApiJsonWriter(new StringWriter());
-                        openApiDocument.SerializeAsV3(textWritter);
-
-                        Uri url;
-                        if (_swaggerOptions.BaseUrl != null)
-                        {
-                            url = _swaggerOptions.BaseUrl;
-                        }
-                        else
-                        {
-                            url = new Uri($"{uri.Scheme}://{uri.Host}");
-                        }
+                        var openApiDocument = SwaggerParser.GenerateOpenApiDocument(stream, _swaggerOptions.UseStrictParsing);
+                        
+                        var url = _swaggerOptions.BaseUrl != null ? _swaggerOptions.BaseUrl : new Uri($"{uri.Scheme}://{uri.Host}");
 
                         var requests = processor.MapFromOpenApiDocument(url, openApiDocument);
 

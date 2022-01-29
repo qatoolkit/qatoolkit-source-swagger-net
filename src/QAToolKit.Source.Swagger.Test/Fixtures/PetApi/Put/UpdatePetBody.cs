@@ -13,7 +13,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post
                 return new List<RequestBody>()
                 {
                     new RequestBody() {
-                        ContentType = ContentType.ToEnum(ContentType.Json),
+                        ContentType = ContentType.Json.Value(),
                         Name = "Pet",
                         Required = true,
                         Properties = PetObjectWithExampleValues.GetProperties()
@@ -25,7 +25,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post
                 return new List<RequestBody>()
                 {
                     new RequestBody() {
-                        ContentType = ContentType.ToEnum(ContentType.Json),
+                        ContentType = ContentType.Json.Value(),
                         Name = "Pet",
                         Required = true,
                         Properties = PetObjectWithoutExampleValues.GetProperties()

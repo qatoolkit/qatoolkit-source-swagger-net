@@ -43,29 +43,11 @@ namespace QAToolKit.Source.Swagger
 
             var restRequests = new List<HttpRequest>();
 
-            var server = openApiDocument.Servers.FirstOrDefault();
-            if (server != null)
-            {
-                var tempUri = new Uri(server.Url, UriKind.RelativeOrAbsolute);
-                if (tempUri.IsAbsoluteUri)
-                {
-                    baseUri = tempUri;
-                }
-                else
-                {
-                    if (baseUri == null)
-                    {
-                        throw new QAToolKitSwaggerException(
-                            "Swagger from file source needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
-                    }
-
-                    baseUri = new Uri(baseUri, tempUri);
-                }
-            }
+            baseUri = ParseBaseUri(baseUri, openApiDocument.Servers.FirstOrDefault());
 
             foreach (var path in openApiDocument.Paths)
             {
-                restRequests.AddRange(GetRestRequestsForPath(baseUri, path));
+                restRequests.AddRange(GetRestRequestsForPath(baseUri, path, openApiDocument.Components?.RequestBodies));
             }
 
             if (_swaggerOptions.UseRequestFilter)
@@ -77,7 +59,49 @@ namespace QAToolKit.Source.Swagger
             return restRequests;
         }
 
-        private IEnumerable<HttpRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path)
+        private static Uri ParseBaseUri(Uri baseUri, OpenApiServer openApiServer)
+        {
+            if (openApiServer != null)
+            {
+                Uri tempUri;
+                try
+                {
+                    tempUri = new Uri(openApiServer.Url, UriKind.RelativeOrAbsolute);
+                }
+                catch (Exception)
+                {
+                    tempUri = baseUri;
+                }
+
+                if (tempUri.IsAbsoluteUri)
+                {
+                    baseUri = tempUri;
+                }
+                else
+                {
+                    if (baseUri == null)
+                    {
+                        throw new QAToolKitSwaggerException(
+                            "Swagger needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
+                    }
+
+                    baseUri = new Uri(baseUri, tempUri);
+                }
+            }
+            else
+            {
+                if (baseUri == null)
+                {
+                    throw new QAToolKitSwaggerException(
+                        "Swagger needs BaseUrl defined. Inject baseUrl with AddBaseUrl in your SwaggerSource instantiation.");
+                }
+            }
+
+            return baseUri;
+        }
+
+        private IEnumerable<HttpRequest> GetRestRequestsForPath(Uri baseUri, KeyValuePair<string, OpenApiPathItem> path,
+            IDictionary<string, OpenApiRequestBody> schemas = null)
         {
             var requests = new List<HttpRequest>();
 
@@ -92,7 +116,7 @@ namespace QAToolKit.Source.Swagger
                     Description = GetDescription(operation),
                     OperationId = GetOperationId(operation),
                     Parameters = GetParameters(operation).ToList(),
-                    RequestBodies = GetRequestBodies(operation),
+                    RequestBodies = GetRequestBodies(operation, schemas),
                     Responses = GetResponses(operation),
                     Tags = GetTags(operation),
                     AuthenticationTypes = GetAuthenticationTypes(operation),
@@ -241,7 +265,7 @@ namespace QAToolKit.Source.Swagger
 #elif NETCOREAPP3_1
                 case "patch":
                     return HttpMethod.Patch;
-#elif NET5_0
+#elif NET6_0
                 case "patch":
                     return HttpMethod.Patch;
 #endif
@@ -254,10 +278,12 @@ namespace QAToolKit.Source.Swagger
         {
             return statusCode switch
             {
+                "2XX" => HttpStatusCode.OK,
                 "200" => HttpStatusCode.OK,
                 "201" => HttpStatusCode.Created,
                 "202" => HttpStatusCode.Accepted,
                 "204" => HttpStatusCode.NoContent,
+                "302" => HttpStatusCode.Found,
                 "400" => HttpStatusCode.BadRequest,
                 "401" => HttpStatusCode.Unauthorized,
                 "403" => HttpStatusCode.Forbidden,
@@ -265,10 +291,28 @@ namespace QAToolKit.Source.Swagger
                 "405" => HttpStatusCode.MethodNotAllowed,
                 "406" => HttpStatusCode.NotAcceptable,
                 "409" => HttpStatusCode.Conflict,
+                "410" => (HttpStatusCode)410,
+                "413" => HttpStatusCode.RequestEntityTooLarge,
+                "415" => HttpStatusCode.UnsupportedMediaType,
+                "429" => (HttpStatusCode)429,
+                "5XX" => HttpStatusCode.InternalServerError,
                 "500" => HttpStatusCode.InternalServerError,
+                "501" => HttpStatusCode.NotImplemented,
+                "502" => HttpStatusCode.BadGateway,
                 "503" => HttpStatusCode.ServiceUnavailable,
+                "504" => HttpStatusCode.GatewayTimeout,
+                "505" => HttpStatusCode.HttpVersionNotSupported,
+#if NETSTANDARD2_0
+                "422" => throw new QAToolKitSwaggerException($"HttpStatusCode not supported '{statusCode}'."),
+#elif NETSTANDARD2_1
+                "422" => HttpStatusCode.UnprocessableEntity,
+#elif NETCOREAPP3_1
+                "422" => HttpStatusCode.UnprocessableEntity,
+#elif NET6_0
+                "422" => HttpStatusCode.UnprocessableEntity,
+#endif
                 "default" => null,
-                _ => throw new QAToolKitSwaggerException($"HttpStatusCode not found '{statusCode}'."),
+                _ => (HttpStatusCode)Convert.ToInt16(statusCode)//throw new QAToolKitSwaggerException($"HttpStatusCode not found '{statusCode}'."),
             };
         }
 
@@ -292,6 +336,7 @@ namespace QAToolKit.Source.Swagger
                 {
                     Name = parameter.Name,
                     Type = parameter.Schema.Type,
+                    Format = parameter.Schema.Format,
                     Nullable = parameter.Schema.Nullable,
                     Required = parameter.Required,
                     Location = GetPlacement(parameter.In.Value)
@@ -320,11 +365,13 @@ namespace QAToolKit.Source.Swagger
             };
         }
 
-        private List<RequestBody> GetRequestBodies(KeyValuePair<OperationType, OpenApiOperation> openApiOperation)
+        private List<RequestBody> GetRequestBodies(KeyValuePair<OperationType, OpenApiOperation> openApiOperation,
+            IDictionary<string, OpenApiRequestBody> schemas = null)
         {
             try
             {
                 var requests = new List<RequestBody>();
+                var schema = new KeyValuePair<string, OpenApiRequestBody>();
 
                 if (openApiOperation.Value.RequestBody == null)
                 {
@@ -333,33 +380,51 @@ namespace QAToolKit.Source.Swagger
 
                 if (openApiOperation.Value.RequestBody.Content.Count == 0)
                 {
-                    return new List<RequestBody>();
-                }
-
-                //TODO: support other content types
-                foreach (var contentType in openApiOperation.Value.RequestBody.Content)
-                {
-                    var requestBody = new RequestBody
+                    if (openApiOperation.Value.RequestBody.Reference == null)
                     {
-                        Name = contentType.Value.Schema.Reference?.Id,
-                        ContentType = ContentType.ToEnum(contentType.Key),
-                        Properties = null,
-                        Required = openApiOperation.Value.RequestBody.Required
-                    };
-
-                    foreach (KeyValuePair<string, OpenApiSchema> property in contentType.Value.Schema.Properties)
-                    {
-                        var temp = GetPropertiesRecursively(property);
-                        if (temp != null)
-                        {
-                            if (requestBody.Properties == null)
-                                requestBody.Properties = new List<Property>();
-
-                            requestBody.Properties.AddRange(temp);
-                        }
+                        return new List<RequestBody>();
                     }
 
-                    requests.Add(requestBody);
+                    if (schemas != null)
+                    {
+                        schema = schemas.FirstOrDefault(x => x.Key == openApiOperation.Value.RequestBody.Reference.Id);
+
+                        foreach (var contentType in schema.Value.Content)
+                        {
+                            var requestBody = new RequestBody
+                            {
+                                Name = contentType.Value.Schema.Reference?.Id,
+                                ContentType = contentType.Key,
+                                Properties = null,
+                                Required = openApiOperation.Value.RequestBody.Required
+                            };
+
+                            ExtractOpenApiSchema(contentType.Value.Schema.AllOf, requestBody);
+                            ExtractOpenApiSchema(contentType.Value.Schema.AnyOf, requestBody);
+                            ExtractOpenApiSchema(contentType.Value.Schema.OneOf, requestBody);
+                            ExtractProperties(contentType, requestBody);
+
+                            requests.Add(requestBody);
+                        }
+                    }
+                }
+                else
+                {
+                    //TODO: support other content types
+                    foreach (var contentType in openApiOperation.Value.RequestBody.Content)
+                    {
+                        var requestBody = new RequestBody
+                        {
+                            Name = contentType.Value.Schema.Reference?.Id,
+                            ContentType = contentType.Key,
+                            Properties = null,
+                            Required = openApiOperation.Value.RequestBody.Required
+                        };
+
+                        ExtractProperties(contentType, requestBody);
+
+                        requests.Add(requestBody);
+                    }
                 }
 
                 return requests;
@@ -370,8 +435,40 @@ namespace QAToolKit.Source.Swagger
             }
         }
 
+        private void ExtractProperties(KeyValuePair<string, OpenApiMediaType> contentType, RequestBody requestBody)
+        {
+            foreach (var property in contentType.Value.Schema.Properties)
+            {
+                var temp = GetPropertiesRecursively(property);
+                if (temp != null)
+                {
+                    if (requestBody.Properties == null)
+                        requestBody.Properties = new List<Property>();
 
-        private List<Property> GetPropertiesRecursively(KeyValuePair<string, OpenApiSchema> source)
+                    requestBody.Properties.AddRange(temp);
+                }
+            }
+        }
+
+        private void ExtractOpenApiSchema(IList<OpenApiSchema> schemas, RequestBody requestBody)
+        {
+            foreach (var schema in schemas)
+            {
+                foreach (var property in schema.Properties)
+                {
+                    var temp = GetPropertiesRecursively(property);
+                    if (temp != null)
+                    {
+                        if (requestBody.Properties == null)
+                            requestBody.Properties = new List<Property>();
+
+                        requestBody.Properties.AddRange(temp);
+                    }
+                }
+            }
+        }
+
+        private List<Property> GetPropertiesRecursively(KeyValuePair<string, OpenApiSchema> source, int counter = 0)
         {
             var properties = new List<Property>();
 
@@ -384,7 +481,7 @@ namespace QAToolKit.Source.Swagger
                 itemsProperty = new Property
                 {
                     Description = source.Value.Items.Description,
-                    Format = source.Value.Items.Description,
+                    Format = source.Value.Items.Format,
                     Type = source.Value.Items.Type,
                     Properties = null,
                     Name = source.Value.Items.Reference?.Id
@@ -396,16 +493,18 @@ namespace QAToolKit.Source.Swagger
 
                 foreach (var property in source.Value.Items.Properties)
                 {
-                    var recursiveProperties = GetPropertiesRecursively(property);
-
-                    if (recursiveProperties != null)
+                    if (counter < 5)
                     {
-                        if (itemsProperty.Properties == null)
+                        var recursiveProperties = GetPropertiesRecursively(property, ++counter);
+                        if (recursiveProperties != null)
                         {
-                            itemsProperty.Properties = new List<Property>();
-                        }
+                            if (itemsProperty.Properties == null)
+                            {
+                                itemsProperty.Properties = new List<Property>();
+                            }
 
-                        itemsProperty.Properties.AddRange(recursiveProperties);
+                            itemsProperty.Properties.AddRange(recursiveProperties);
+                        }
                     }
                 }
             }
@@ -415,7 +514,7 @@ namespace QAToolKit.Source.Swagger
             #region enums
 
             Property enumProperty = null;
-            if (source.Value.Enum != null && source.Value.Enum.Count > 0)
+            if (source.Value.Enum is { Count: > 0 })
             {
                 enumProperty = new Property
                 {
@@ -452,7 +551,7 @@ namespace QAToolKit.Source.Swagger
                 Name = source.Value.Reference != null ? source.Value.Reference.Id : source.Key,
                 Description = source.Value.Description,
                 Type = source.Value.Type,
-                Format = source.Value.Format,
+                Format = itemsProperty != null ? itemsProperty.Type : source.Value.Format,
                 Properties = null
             };
 
@@ -480,14 +579,17 @@ namespace QAToolKit.Source.Swagger
 
             foreach (var property in source.Value.Properties)
             {
-                var propsTem = GetPropertiesRecursively(property);
-
-                if (propsTem != null && prop.Properties == null)
+                if (counter < 5)
                 {
-                    prop.Properties = new List<Property>();
-                }
+                    var propsTem = GetPropertiesRecursively(property, ++counter);
 
-                prop.Properties.AddRange(propsTem);
+                    if (propsTem != null && prop.Properties == null)
+                    {
+                        prop.Properties = new List<Property>();
+                    }
+
+                    prop.Properties.AddRange(propsTem);
+                }
             }
 
             properties.Add(prop);
@@ -541,28 +643,34 @@ namespace QAToolKit.Source.Swagger
         private ResponseType GetResponseType(OpenApiResponse value)
         {
             foreach (var contentType in value.Content.Where(contentType =>
-                ContentType.From(contentType.Key) == ContentType.Json))
+                contentType.Key == ContentType.Json.Value()))
             {
-                if (contentType.Value.Schema.Items != null &&
-                    (contentType.Value.Schema.Items.Type == "array" ||
-                     contentType.Value.Schema.Items.Type != "object") &&
-                    contentType.Value.Schema.Type == "array")
-                {
+                if (contentType.Value.Schema != null 
+                    && contentType.Value.Schema.Items != null 
+                    && (contentType.Value.Schema.Items.Type == "array" ||
+                        contentType.Value.Schema.Items.Type != "object") &&
+                        contentType.Value.Schema.Type == "array")
+                {  
                     return ResponseType.Array;
                 }
-                else if (contentType.Value.Schema.Items != null &&
-                         (contentType.Value.Schema.Items.Type == "array" ||
-                          contentType.Value.Schema.Items.Type == "object") &&
-                         contentType.Value.Schema.Type == "array")
+                else if (contentType.Value.Schema != null 
+                         && contentType.Value.Schema.Items != null 
+                         && (contentType.Value.Schema.Items.Type == "array" ||
+                             contentType.Value.Schema.Items.Type == "object") &&
+                             contentType.Value.Schema.Type == "array")
                 {
                     return ResponseType.Objects;
                 }
-                else if (contentType.Value.Schema.Items == null && contentType.Value.Schema.Type == "object")
+                else if (contentType.Value.Schema != null 
+                         && contentType.Value.Schema.Items == null 
+                         && contentType.Value.Schema.Type == "object")
                 {
                     return ResponseType.Object;
                 }
-                else if (contentType.Value.Schema.Items == null &&
-                         (contentType.Value.Schema.Type != "object" || contentType.Value.Schema.Type != "array"))
+                else if (contentType.Value.Schema != null 
+                         && contentType.Value.Schema.Items == null 
+                         && (contentType.Value.Schema.Type != "object" ||
+                             contentType.Value.Schema.Type != "array"))
                 {
                     return ResponseType.Primitive;
                 }
@@ -591,9 +699,10 @@ namespace QAToolKit.Source.Swagger
 
             //TODO: support other content types
             foreach (var contentType in openApiResponse.Content.Where(contentType =>
-                ContentType.From(contentType.Key) == ContentType.Json))
+                contentType.Key == ContentType.Json.Value()))
             {
-                if (contentType.Value.Schema.Properties != null && contentType.Value.Schema.Properties.Count > 0)
+                if (contentType.Value.Schema != null && contentType.Value.Schema.Properties != null &&
+                    contentType.Value.Schema.Properties.Count > 0)
                 {
                     foreach (KeyValuePair<string, OpenApiSchema> property in contentType.Value.Schema.Properties)
                     {
@@ -601,11 +710,64 @@ namespace QAToolKit.Source.Swagger
                     }
                 }
 
-                if (contentType.Value.Schema.Items != null)
+                if (contentType.Value.Schema != null && contentType.Value.Schema.AllOf != null &&
+                    contentType.Value.Schema.AllOf.Count > 0)
                 {
-                    foreach (KeyValuePair<string, OpenApiSchema> property in contentType.Value.Schema.Items.Properties)
+                    foreach (var schema in contentType.Value.Schema.AllOf)
                     {
-                        properties.AddRange(GetPropertiesRecursively(property));
+                        foreach (var property in schema.Properties)
+                        {
+                            properties.AddRange(GetPropertiesRecursively(property));
+                        }
+                    }
+                }
+
+                if (contentType.Value.Schema != null && contentType.Value.Schema.AnyOf != null &&
+                    contentType.Value.Schema.AnyOf.Count > 0)
+                {
+                    foreach (var schema in contentType.Value.Schema.AnyOf)
+                    {
+                        foreach (var property in schema.Properties)
+                        {
+                            properties.AddRange(GetPropertiesRecursively(property));
+                        }
+                    }
+                }
+
+                if (contentType.Value.Schema != null && contentType.Value.Schema.OneOf != null &&
+                    contentType.Value.Schema.OneOf.Count > 0)
+                {
+                    foreach (var schema in contentType.Value.Schema.OneOf)
+                    {
+                        foreach (var property in schema.Properties)
+                        {
+                            properties.AddRange(GetPropertiesRecursively(property));
+                        }
+                    }
+                }
+
+                if (contentType.Value.Schema != null && contentType.Value.Schema.Items != null)
+                {
+                    if (contentType.Value.Schema.Items != null 
+                        && contentType.Value.Schema.Items.Properties != null
+                        && contentType.Value.Schema.Items.Properties.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, OpenApiSchema> property in contentType.Value.Schema.Items
+                            .Properties)
+                        {
+                            properties.AddRange(GetPropertiesRecursively(property));
+                        }
+                    }
+                    else if (contentType.Value.Schema.Items != null 
+                             && contentType.Value.Schema.Items.Properties != null
+                             && contentType.Value.Schema.Items.Properties.Count == 0)
+                    {
+                        properties.Add(new Property()
+                        {
+                            Name = $"_{contentType.Value.Schema.Type}",
+                            Format = contentType.Value.Schema.Items.Type,
+                            Type = contentType.Value.Schema.Type
+                        });
                     }
                 }
             }

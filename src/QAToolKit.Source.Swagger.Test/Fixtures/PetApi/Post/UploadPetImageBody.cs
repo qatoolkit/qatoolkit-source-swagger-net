@@ -10,7 +10,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post
             return new List<RequestBody>()
                 {
                     new RequestBody() {
-                        ContentType = ContentType.ToEnum(ContentType.OctetStream),
+                        ContentType = ContentType.OctetStream.Value(),
                         Name = null,
                         Required = false,
                         Properties = null

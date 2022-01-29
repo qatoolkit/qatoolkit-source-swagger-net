@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("QAToolKit.Source.Swagger.Test")]
+
 namespace QAToolKit.Source.Swagger
 {
     /// <summary>
@@ -14,38 +15,51 @@ namespace QAToolKit.Source.Swagger
         /// Request filter for filtering out the swagger endpoints
         /// </summary>
         internal RequestFilter RequestFilter { get; private set; }
+
         /// <summary>
         /// Is Swagger protected with Basic authentication
         /// </summary>
         internal bool UseBasicAuth { get; private set; } = false;
+
         /// <summary>
         /// Is Swagger protected with NTLM authentication
         /// </summary>
         internal bool UseNTLMAuth { get; private set; } = false;
+
         /// <summary>
         /// Use request filters, to process only selected endpoints.
         /// </summary>
         internal bool UseRequestFilter { get; private set; } = false;
+
         /// <summary>
         /// Swagger basic authentication user name
         /// </summary>
         internal string UserName { get; private set; }
+
         /// <summary>
         /// Swagger basic authentication password
         /// </summary>
         internal string Password { get; private set; }
+
         /// <summary>
         /// Set custom base API URL to the resulting HttpRequest list.
         /// </summary>
         internal Uri BaseUrl { get; private set; }
+
         /// <summary>
         /// Use Swagger example values that come with Swagger file. Default us 'false'.
         /// </summary>
         public bool UseSwaggerExampleValues { get; set; } = false;
+
         /// <summary>
         /// Disable SSL validation when accessing swagger.json file. Default is 'false'.
         /// </summary>
         public bool DisableSSLValidation { get; set; } = false;
+
+        /// <summary>
+        /// Prevent processing if any parsing errors are present
+        /// </summary>
+        public bool UseStrictParsing { get; set; } = false;
 
         /// <summary>
         /// Add basic authentication to access swagger.json file.
