@@ -62,8 +62,9 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Get
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsResponse = FindPetsByTagsResponses.Get(true).ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            var expectedPetsResponse = JsonConvert.SerializeObject( FindPetsByTagsResponses.Get(true).OrderBy(x => x.StatusCode), Formatting.None);
+            Assert.Equal(expectedPetsResponse.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Responses.OrderBy(x => x.StatusCode), Formatting.None).ToLower());
+            
 
             Assert.Equal("Finds Pets by tags", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>

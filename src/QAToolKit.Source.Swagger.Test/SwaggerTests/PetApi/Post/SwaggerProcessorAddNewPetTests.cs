@@ -54,13 +54,13 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             Assert.Empty(requests.FirstOrDefault().Parameters);
             Assert.Equal("/pet", requests.FirstOrDefault().Path);
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
-
-            var expectedPetsBody = AddNewPetBody.Get(false).ToExpectedObject();
-            expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
-                .Where(c => c.ContentType == ContentType.Enumeration.Json).ToList());
-
-            var expectedPetsResponse = AddNewPetResponse.Get(false).ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            
+            var expectedPetsBody = JsonConvert.SerializeObject(AddNewPetBody.Get(false).FirstOrDefault(), Formatting.None);
+            Assert.Equal(expectedPetsBody.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().RequestBodies
+                .SingleOrDefault(c => c.ContentType == ContentType.Json.Value()), Formatting.None).ToLower());
+            
+            var expectedPetsResponse = JsonConvert.SerializeObject(AddNewPetResponse.Get(false), Formatting.None);
+            Assert.Equal(expectedPetsResponse.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Responses, Formatting.None).ToLower());
 
             Assert.Equal("Add a new pet to the store", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
@@ -101,12 +101,9 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             Assert.Equal("/pet", requests.FirstOrDefault().Path);
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
-            var expectedPetsBody = AddNewPetBody.Get(true).ToExpectedObject();
-            expectedPetsBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
-                .Where(c => c.ContentType == ContentType.Enumeration.Json).ToList());
-
-            var expectedPetsResponse = AddNewPetResponse.Get(true).ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            var expectedPetsBody = JsonConvert.SerializeObject(AddNewPetBody.Get(true).FirstOrDefault(), Formatting.None);
+            Assert.Equal(expectedPetsBody.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().RequestBodies
+                .SingleOrDefault(c => c.ContentType == ContentType.Json.Value()), Formatting.None).ToLower());
 
             Assert.Equal("Add a new pet to the store", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>

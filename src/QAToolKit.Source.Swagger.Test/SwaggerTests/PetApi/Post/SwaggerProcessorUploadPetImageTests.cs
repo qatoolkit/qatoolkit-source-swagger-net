@@ -1,5 +1,4 @@
-﻿using ExpectedObjects;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using QAToolKit.Core.Models;
 using QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post;
@@ -54,16 +53,15 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             Assert.Equal("/pet/{petId}/uploadImage", requests.FirstOrDefault().Path);
             Assert.Single(requests.FirstOrDefault().Responses);
             Assert.Equal(2, requests.FirstOrDefault().Parameters.Count);
-
-            var expectedUploadPetImageParameters = UploadPetImageParameters.Get(true).ToExpectedObject();
-            expectedUploadPetImageParameters.ShouldEqual(requests.FirstOrDefault().Parameters);
-
-            var expectedUploadPetImageBody = UploadPetImageBody.Get().ToExpectedObject();
-            expectedUploadPetImageBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
-                .Where(c => c.ContentType == ContentType.Enumeration.OctetStream).ToList());
-
-            var expectedUploadPetImageResponse = UploadPetImageResponse.Get().ToExpectedObject();
-            expectedUploadPetImageResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            
+            var expectedUploadPetImageParameters = JsonConvert.SerializeObject(UploadPetImageParameters.Get(true), Formatting.None);
+            Assert.Equal(expectedUploadPetImageParameters.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Parameters, Formatting.None).ToLower());
+            
+            var expectedUploadPetImageBody = JsonConvert.SerializeObject( UploadPetImageBody.Get(), Formatting.None);
+            Assert.Equal(expectedUploadPetImageBody.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().RequestBodies.Where(c => c.ContentType == ContentType.OctetStream.Value()), Formatting.None).ToLower());
+            
+            var expectedUploadPetImageResponse = JsonConvert.SerializeObject( UploadPetImageResponse.Get().OrderBy(x => x.StatusCode), Formatting.None);
+            Assert.Equal(expectedUploadPetImageResponse.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Responses.OrderBy(x => x.StatusCode), Formatting.None).ToLower());
 
             Assert.Equal("uploads an image", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
@@ -104,15 +102,24 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.PetApi.Post
             Assert.Single(requests.FirstOrDefault().Responses);
             Assert.Equal(2, requests.FirstOrDefault().Parameters.Count);
 
-            var expectedUploadPetImageParameters = UploadPetImageParameters.Get(true).ToExpectedObject();
+           /* var expectedUploadPetImageParameters = UploadPetImageParameters.Get(true).ToExpectedObject();
             expectedUploadPetImageParameters.ShouldEqual(requests.FirstOrDefault().Parameters);
 
             var expectedUploadPetImageBody = UploadPetImageBody.Get().ToExpectedObject();
             expectedUploadPetImageBody.ShouldEqual(requests.FirstOrDefault().RequestBodies
-                .Where(c => c.ContentType == ContentType.Enumeration.OctetStream).ToList());
+                .Where(c => c.ContentType == ContentType.OctetStream.Value()).ToList());
 
             var expectedUploadPetImageResponse = UploadPetImageResponse.Get().ToExpectedObject();
             expectedUploadPetImageResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            */
+            var expectedUploadPetImageParameters = JsonConvert.SerializeObject(UploadPetImageParameters.Get(true), Formatting.None);
+            Assert.Equal(expectedUploadPetImageParameters.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Parameters, Formatting.None).ToLower());
+            
+            var expectedUploadPetImageBody = JsonConvert.SerializeObject( UploadPetImageBody.Get(), Formatting.None);
+            Assert.Equal(expectedUploadPetImageBody.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().RequestBodies.Where(c => c.ContentType == ContentType.OctetStream.Value()), Formatting.None).ToLower());
+            
+            var expectedUploadPetImageResponse = JsonConvert.SerializeObject( UploadPetImageResponse.Get().OrderBy(x => x.StatusCode), Formatting.None);
+            Assert.Equal(expectedUploadPetImageResponse.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Responses.OrderBy(x => x.StatusCode), Formatting.None).ToLower());
 
             Assert.Equal("uploads an image", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>

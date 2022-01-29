@@ -1,4 +1,5 @@
-﻿using QAToolKit.Core.Models;
+﻿using System.Collections.Generic;
+using QAToolKit.Core.Models;
 using System.Net;
 
 namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi

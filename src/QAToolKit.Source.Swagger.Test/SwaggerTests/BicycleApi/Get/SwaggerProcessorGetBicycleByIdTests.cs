@@ -7,6 +7,7 @@ using QAToolKit.Source.Swagger.Test.Fixtures.BicycleApi.Get.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -55,12 +56,12 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.BicycleApi.Get
             Assert.Equal("/api/bicycles", requests.FirstOrDefault().Path);
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
-
-            var getBikesParameters = BicyclesParameters.Get(true).ToExpectedObject();
-            getBikesParameters.ShouldEqual(requests.FirstOrDefault().Parameters);
-
-            var expectedPetsResponse = GetBicycleByIdResponse.Get().ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
+            
+            var getBikesParameters = JsonConvert.SerializeObject(BicyclesParameters.Get(true), Formatting.None);
+            Assert.Equal(getBikesParameters.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Parameters, Formatting.None).ToLower());
+            
+            var expectedPetsResponse = JsonConvert.SerializeObject( GetBicycleByIdResponse.Get().OrderBy(x => x.StatusCode), Formatting.None);
+            Assert.Equal(expectedPetsResponse.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Responses.OrderBy(x => x.StatusCode), Formatting.None).ToLower());
 
             Assert.Equal("Get all bikes by filter", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
@@ -101,12 +102,12 @@ namespace QAToolKit.Source.Swagger.Test.SwaggerTests.BicycleApi.Get
             Assert.Empty(requests.FirstOrDefault().RequestBodies);
             Assert.Equal(2, requests.FirstOrDefault().Responses.Count);
 
-            var getBikesParameters = BicyclesParameters.Get(true).ToExpectedObject();
-            getBikesParameters.ShouldEqual(requests.FirstOrDefault().Parameters);
-
-            var expectedPetsResponse = GetBicycleByIdResponse.Get().ToExpectedObject();
-            expectedPetsResponse.ShouldEqual(requests.FirstOrDefault().Responses);
-
+            var getBikesParameters = JsonConvert.SerializeObject(BicyclesParameters.Get(true), Formatting.None);
+            Assert.Equal(getBikesParameters.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Parameters, Formatting.None).ToLower());
+            
+            var expectedPetsResponse = JsonConvert.SerializeObject( GetBicycleByIdResponse.Get().OrderBy(x => x.StatusCode), Formatting.None);
+            Assert.Equal(expectedPetsResponse.ToLower(), JsonConvert.SerializeObject(requests.FirstOrDefault().Responses.OrderBy(x => x.StatusCode), Formatting.None).ToLower());
+            
             Assert.Equal("Get all bikes by filter", requests.FirstOrDefault().Summary);
             Assert.Collection(requests.FirstOrDefault().Tags, item =>
             {

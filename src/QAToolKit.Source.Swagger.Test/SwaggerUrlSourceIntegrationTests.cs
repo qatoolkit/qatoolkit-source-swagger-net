@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using QAToolKit.Core.Models;
 using System;
 using System.Threading.Tasks;
+using QAToolKit.Source.Swagger.Exceptions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -69,7 +70,7 @@ namespace QAToolKit.Source.Swagger.Test
         public async Task WrongSwaggerUrlSourceArgumentNullExceptionTest_Fails()
         {
             var urlSource = new SwaggerUrlSource();
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await urlSource.Load(
+            await Assert.ThrowsAsync<InvalidSwaggerException>(async () => await urlSource.Load(
                 new Uri[]
                 {
                       new Uri("https://qatoolkitapi.azurewebsites.net/swagger/index.html")
@@ -80,7 +81,7 @@ namespace QAToolKit.Source.Swagger.Test
         public async Task WrongSwaggerUrlSourceArgumentNullException2Test_Fails()
         {
             var urlSource = new SwaggerUrlSource();
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await urlSource.Load(
+            await Assert.ThrowsAsync<InvalidSwaggerException>(async () => await urlSource.Load(
                 new Uri[]
                 {
                       new Uri("https://github.com")
