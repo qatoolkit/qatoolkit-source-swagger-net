@@ -16,6 +16,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.BicycleApi.Get.Helpers
                         Location = Location.Query,
                         Nullable = false,
                         Type = "integer",
+                        Format = "int32",
                         Required = false,
                         Value = null
                     },
@@ -24,6 +25,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.BicycleApi.Get.Helpers
                         Location = Location.Query,
                         Nullable = false,
                         Type = "string",
+                        Format = null,
                         Required = false,
                         Value = "1"
                     },

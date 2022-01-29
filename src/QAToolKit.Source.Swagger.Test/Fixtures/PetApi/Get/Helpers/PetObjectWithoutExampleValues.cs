@@ -60,7 +60,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get.Helpers
                         new Property(){
                             Name = "photoUrls",
                             Description = null,
-                            Format = null,
+                            Format = "string",
                             Required = false,
                             Properties = new List<Property>(){
                                 new Property()
@@ -80,7 +80,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Get.Helpers
                         new Property(){
                             Name = "tags",
                             Description = null,
-                            Format = null,
+                            Format = "object",
                             Required = false,
                             Properties = new List<Property>()
                             {

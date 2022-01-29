@@ -108,6 +108,11 @@
         /// <summary>
         /// Binary array type
         /// </summary>
-        BinaryArray
+        BinaryArray,
+        
+        /// <summary>
+        /// Url/Uri string type
+        /// </summary>
+        Uri
     }
 }

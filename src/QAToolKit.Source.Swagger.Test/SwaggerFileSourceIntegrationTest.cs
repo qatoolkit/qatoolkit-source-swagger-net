@@ -31,7 +31,8 @@ namespace QAToolKit.Source.Swagger.Test
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
             });
 
-            var requests = await fileSource.Load(new List<FileInfo>() {
+            var requests = await fileSource.Load(new List<FileInfo>()
+            {
                 new FileInfo("Assets/swagger-pets-test.json")
             });
 
@@ -44,23 +45,26 @@ namespace QAToolKit.Source.Swagger.Test
         {
             var fileSource = new SwaggerFileSource();
 
-            var exception = await Assert.ThrowsAsync<QAToolKitSwaggerException>(async () => await fileSource.Load(new List<FileInfo>() {
-                new FileInfo("Assets/swagger-pets-test.json")
-            }));
+            var exception = await Assert.ThrowsAsync<QAToolKitSwaggerException>(async () =>
+                await fileSource.Load(new List<FileInfo>()
+                {
+                    new FileInfo("Assets/swagger-pets-test.json")
+                }));
 
             _logger.LogInformation(exception.Message);
         }
 
         [Fact]
-        public async void SwaggerFileSourceYamlWithoutWhitelistTest_Fails()
+        public async void SwaggerFileSourceYamlWithoutWhitelistTest()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
                 options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
             });
 
-            var requests = await fileSource.Load(new List<FileInfo>() {
-                new FileInfo("Assets/support-tickets.yaml")
+            var requests = await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/support-tickets-ok.yaml")
             });
 
             _logger.LogInformation(JsonConvert.SerializeObject(requests));
@@ -71,7 +75,7 @@ namespace QAToolKit.Source.Swagger.Test
         }
 
         [Fact]
-        public async void SwaggerFileSourceYamlWithWhitelistTest_Fails()
+        public async void SwaggerFileSourceYamlWithWhitelistTest()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
@@ -82,8 +86,9 @@ namespace QAToolKit.Source.Swagger.Test
                 });
             });
 
-            var requests = await fileSource.Load(new List<FileInfo>() {
-                new FileInfo("Assets/support-tickets.yaml")
+            var requests = await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/support-tickets-ok.yaml")
             });
 
             _logger.LogInformation(JsonConvert.SerializeObject(requests));
@@ -99,7 +104,7 @@ namespace QAToolKit.Source.Swagger.Test
         }
 
         [Fact]
-        public async void SwaggerFileSourceYamlWithWhitelistAndExampleTest_Fails()
+        public async void SwaggerFileSourceYamlWithWhitelistAndExampleTest()
         {
             var fileSource = new SwaggerFileSource(options =>
             {
@@ -109,10 +114,12 @@ namespace QAToolKit.Source.Swagger.Test
                     EndpointNameWhitelist = new string[] { "getSupportTicketsList" }
                 });
                 options.UseSwaggerExampleValues = true;
+                options.UseStrictParsing = true;
             });
 
-            var requests = await fileSource.Load(new List<FileInfo>() {
-                new FileInfo("Assets/support-tickets.yaml")
+            var requests = await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/support-tickets-ok.yaml")
             });
 
             _logger.LogInformation(JsonConvert.SerializeObject(requests));
@@ -127,5 +134,51 @@ namespace QAToolKit.Source.Swagger.Test
             Assert.Single(requests);
         }
 
+        [Fact]
+        public async void SwaggerFileSourceYamlWithoutWhitelistTest_Fails()
+        {
+            var fileSource = new SwaggerFileSource(options =>
+            {
+                options.AddBaseUrl(new Uri("https://petstore3.swagger.io/"));
+            });
+
+            Assert.ThrowsAsync<InvalidSwaggerException>(async () => await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/support-tickets.yaml")
+            }));
+        }
+        
+        [Fact]
+        public async void InvalidSwaggerFile_Fails()
+        {
+            var fileSource = new SwaggerFileSource();
+
+            Assert.ThrowsAsync<InvalidSwaggerException>(async () => await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/invalid.swagger.json")
+            }));
+        }
+        
+        [Fact]
+        public async void UnsupportedSwaggerFilev1_Fails()
+        {
+            var fileSource = new SwaggerFileSource();
+
+            Assert.ThrowsAsync<UnsupportedSwaggerException>(async () => await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/swagger-pets-test-unsuppoted-v1.0.json")
+            }));
+        }
+        
+        [Fact]
+        public async void UnsupportedSwaggerFilev3_1_Fails()
+        {
+            var fileSource = new SwaggerFileSource();
+
+            Assert.ThrowsAsync<UnsupportedSwaggerException>(async () => await fileSource.Load(new List<FileInfo>()
+            {
+                new FileInfo("Assets/swagger-pets-test-unsuppoted-v3.1.json")
+            }));
+        }
     }
 }

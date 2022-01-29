@@ -82,7 +82,7 @@ namespace QAToolKit.Source.Swagger
 
                         var stream = await httpClient.GetStreamAsync(uri);
 
-                        var openApiDocument = SwaggerParser.GenerateOpenApiDocument(stream);
+                        var openApiDocument = SwaggerParser.GenerateOpenApiDocument(stream, _swaggerOptions.UseStrictParsing);
                         
                         var url = _swaggerOptions.BaseUrl != null ? _swaggerOptions.BaseUrl : new Uri($"{uri.Scheme}://{uri.Host}");
 

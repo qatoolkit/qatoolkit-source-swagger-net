@@ -16,21 +16,25 @@ namespace QAToolKit.Source.Swagger
         /// <summary>
         /// Parse Swagger document (JSON, YML) from stream to the OpenApiDocument
         /// </summary>
-        /// <param name="SourceStream"></param>
+        /// <param name="sourceStream"></param>
+        /// <param name="strictParsing"></param>
         /// <returns></returns>
         /// <exception cref="InvalidSwaggerException"></exception>
         /// <exception cref="UnsupportedSwaggerException"></exception>
-        public static OpenApiDocument GenerateOpenApiDocument(Stream SourceStream)
+        public static OpenApiDocument GenerateOpenApiDocument(Stream sourceStream, bool strictParsing)
         {
             OpenApiDocument openApiDocument;
             OpenApiSpecVersion openApiSpecVersion;
             try
             {
-                openApiDocument = new OpenApiStreamReader().Read(SourceStream, out var diagnostic);
+                openApiDocument = new OpenApiStreamReader().Read(sourceStream, out var diagnostic);
 
-                if (diagnostic.Errors is { Count: > 0 })
+                if (strictParsing)
                 {
-                    throw new InvalidSwaggerException("Invalid Swagger format.", diagnostic.Errors);
+                    if (diagnostic.Errors is { Count: > 0 })
+                    {
+                        throw new SwaggerValidationException("Swagger validation failed.", diagnostic.Errors);
+                    }
                 }
 
                 openApiSpecVersion = diagnostic.SpecificationVersion;
@@ -54,7 +58,17 @@ namespace QAToolKit.Source.Swagger
                     throw new UnsupportedSwaggerException("Unsupported Swagger version.");
             }
 
+            if (openApiDocument.IsOpenApiDocumentEmpty())
+            {
+                throw new InvalidSwaggerException("Swagger document is invalid, check the input.");
+            }
+            
             return openApiDocument;
+        }
+
+        private static bool IsOpenApiDocumentEmpty(this OpenApiDocument openApiDocument)
+        {
+            return openApiDocument?.Components == null || openApiDocument?.Paths == null;
         }
         
         /// <summary>
@@ -70,10 +84,14 @@ namespace QAToolKit.Source.Swagger
                 "string" when swaggerFormat == "binary" => PropertyType.Binary,
                 "string" when swaggerFormat == "date-time" => PropertyType.DateTime,
                 "string" when swaggerFormat == "date" => PropertyType.Date,
+                "string" when swaggerFormat == "url" => PropertyType.Uri,
+                "string" when swaggerFormat == "uri" => PropertyType.Uri,
                 "string" when swaggerFormat == null => PropertyType.String,
+                "string" => PropertyType.String,
                 "boolean" => PropertyType.Boolean,
                 "integer" when swaggerFormat == "int32" => PropertyType.Int32,
                 "integer" when swaggerFormat == "int64" => PropertyType.Int64,
+                "integer" => PropertyType.Int32,
                 "object" => PropertyType.Object,
                 "number" when swaggerFormat == null => PropertyType.Int32,
                 "number" when swaggerFormat == "float" => PropertyType.Float,

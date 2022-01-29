@@ -41,7 +41,7 @@ namespace QAToolKit.Source.Swagger
             {
                 using (var sourceStream = File.OpenRead(filePath.FullName))
                 {
-                    var openApiDocument = SwaggerParser.GenerateOpenApiDocument(sourceStream);
+                    var openApiDocument = SwaggerParser.GenerateOpenApiDocument(sourceStream, _swaggerOptions.UseStrictParsing);
 
                     var requests = processor.MapFromOpenApiDocument(_swaggerOptions.BaseUrl, openApiDocument);
 

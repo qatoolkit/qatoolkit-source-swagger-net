@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using Microsoft.OpenApi.Models;
 
 namespace QAToolKit.Source.Swagger.Exceptions
 {
@@ -16,14 +13,6 @@ namespace QAToolKit.Source.Swagger.Exceptions
         /// InvalidSwagger exception
         /// </summary>
         public InvalidSwaggerException(string message) : base(message)
-        {
-        }
-
-        /// <summary>s
-        /// InvalidSwagger exception
-        /// </summary>
-        public InvalidSwaggerException(string message, IList<OpenApiError> errors) : base(message += string.Join(",",
-            errors.Select(s => new KeyValuePair<string, string>(s.Message, s.Pointer)).ToList()))
         {
         }
 

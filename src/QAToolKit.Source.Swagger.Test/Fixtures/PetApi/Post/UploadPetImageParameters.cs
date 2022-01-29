@@ -16,6 +16,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post
                         Location = Location.Path,
                         Nullable = false,
                         Type = "integer",
+                        Format = "int64",
                         Required = true,
                         Value = null
                     },
@@ -24,6 +25,7 @@ namespace QAToolKit.Source.Swagger.Test.Fixtures.PetApi.Post
                         Location = Location.Query,
                         Nullable = false,
                         Type = "string",
+                        Format = null,
                         Required = false,
                         Value = null
                     }
