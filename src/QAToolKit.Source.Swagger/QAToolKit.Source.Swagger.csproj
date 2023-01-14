@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+<<<<<<< HEAD
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
+=======
+		<TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6.0</TargetFrameworks>
+>>>>>>> main
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>latest</LangVersion>
 		<ProjectGuid>ee940718-945a-4c34-8ce6-0790972ada44</ProjectGuid>
@@ -19,7 +23,11 @@
 		<PackageProjectUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</PackageProjectUrl>
 		<PackageIcon>qatoolkit-64x64.png</PackageIcon>
 		<RepositoryUrl>https://github.com/qatoolkit/qatoolkit-source-swagger-net</RepositoryUrl>
+<<<<<<< HEAD
 		<PackageTags>qatoolkit-source-swagger-net;.net;c#;f#;swagger;dotnet;netstandard;net7</PackageTags>
+=======
+		<PackageTags>qatoolkit-source-swagger-net;.net;c#;f#;swagger;dotnet;netstandard;net6</PackageTags>
+>>>>>>> main
 		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
@@ -37,6 +45,9 @@
 		<PackageReference Include="Microsoft.OpenApi" Version="1.2.3" />
 		<PackageReference Include="Microsoft.OpenApi.Readers" Version="1.2.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="QAToolKit.Core" Version="0.3.13" />
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net7.0</TargetFrameworks>
+		<PackageTags>qatoolkit-source-swagger-net;.net;c#;f#;swagger;dotnet;netstandard;net7</PackageTags>
 		<PackageReference Include="QAToolKit.Core" Version="0.3.13" />
 	</ItemGroup>
 
