@@ -265,7 +265,7 @@ namespace QAToolKit.Source.Swagger
 #elif NETCOREAPP3_1
                 case "patch":
                     return HttpMethod.Patch;
-#elif NET6_0
+#elif NET7_0
                 case "patch":
                     return HttpMethod.Patch;
 #endif
